@@ -8,12 +8,13 @@ import {analyse} from './sentiment-analyser'
 
 // import {convertTextToSound } from './audio'
 import {
-    generateSentimentSong,
-    fetchScales,
-    startAudio,
-    createClip, 
-    createLead,
-    createPercussion
+  generateSentimentSong,
+  fetchScales,
+  startAudio,
+  createClip,
+  createLead,
+  createPercussion,
+  changeRow
 } from "./audio"
 
 //const file = __dirname + text
@@ -23,6 +24,9 @@ console.log("Reading Ts and Cs from", file )
 
 const STEPS = 4
 let progress = 0
+
+let lead
+let drums
 
 const run = () =>{
 
@@ -55,14 +59,39 @@ const run = () =>{
     ).then(scales => {
 
         progress = 3 / STEPS
-        console.log("Audio READY!", scales)
+        
 
         // const clip = createClip()
         // clip.start()
 
-        createLead()
-        createPercussion()
-        startAudio()
+        lead = createLead()
+        drums = createPercussion()
+
+        console.log("Audio READY!", {scales, lead, drums});
+
+        // now trigger certain parts...
+        //lead.startRow(1)
+//console.log(lead)
+
+
+        startAudio(1, 10, time=>{
+            console.log("Beat", time)
+        })
+        
+
+        let test = 1
+        window.addEventListener('keydown', e => {
+
+            // if (lead) {
+            //     lead.startClip(test++)
+            //     console.log("Testing row", test);
+            // }else{
+            //     console.error('fucked')
+            // }
+            
+            changeRow(test++)
+            
+        })
 
     })
     .catch(error => {
@@ -72,4 +101,5 @@ const run = () =>{
 }
 
 
-setTimeout( run, 440 )
+setTimeout( run, 0 )
+

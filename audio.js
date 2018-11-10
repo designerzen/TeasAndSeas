@@ -1,4 +1,13 @@
-import { chord, clip, session, scale, scales, midi, mode } from "scribbletune";
+// import {chord } from "./external/scribbletune/src/chord"
+// import { clip } from "./external/scribbletune/src/clip"
+// import { session } from "./external/scribbletune/src/session"
+// import { scale } from "./external/scribbletune/src/scale"
+// import { scales} from "./external/scribbletune/src/scales"
+// import { midi } from "./external/scribbletune/src/midi"
+// import { mode } from "./external/scribbletune/src/mode"
+import { chord, clip, session, scale, scales, midi, mode } from "./external/scribbletune/src"
+
+
 import Tone from 'tone'
 
 window.Tone = Tone
@@ -10,24 +19,26 @@ const channels = session()
 
 // create drum track for background...
 export const createPercussion = () =>{
-    channels.createChannel({
+    return channels.createChannel({
       sample: "https://scribbletune.com/sounds/kick.wav",
       clips: [
-        { pattern: "x" },
-        { pattern: "xxx[xx]" },
-        { pattern: "x" },
-        { pattern: "xxx[-x]" }
+          clip({ pattern: "xxxx", callback:(e)=>{console.log('1--->',e) } }),
+          clip({ pattern: "x-x-", callback:(e)=>{console.log('2--->',e) } }),
+          clip({ pattern: "-x-x", callback:(e)=>{console.log('3--->',e) } }),
+          clip({ pattern: "x_x_", callback:(e)=>{console.log('4--->',e) } })
+
       ]
     })
 }
 
 // we need to be able to flip between clips...
 export const createLead = (instrument = "PolySynth") =>{
-    channels.createChannel({
+    return channels.createChannel({
       synth: instrument,
       clips: [
-        { 
-            pattern: "x", 
+          // SAD
+        {
+            pattern: "x",
             notes: 'C4 D#4'
         },
         { 
@@ -38,12 +49,13 @@ export const createLead = (instrument = "PolySynth") =>{
             pattern: "x", 
             notes: 'C3 D#4' 
         },
+        // HAPPY
         { 
             pattern: "xxx[-x]", 
             notes: 'C1 D#4' 
         }
       ]
-    });
+    })
 }
     
 
@@ -139,7 +151,21 @@ export const createClip = (sentiment, instrument ="Synth") =>{
     })
 }
 
-export const startAudio = () =>{
-    channels.startRow(1)
+export const startAudio = ( row=1, bpm=90, callback ) =>{
+    channels.startRow(row)
+
+    Tone.Transport.bpm.value = bpm
     Tone.Transport.start()
+
+    Tone.Transport.scheduleRepeat( (time)=> {
+        //do something with the time
+        
+        callback(time);
+
+    }, "8n");
+
+}
+
+export const changeRow = (row=1) =>{
+    channels.startRow(row)
 }
