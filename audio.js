@@ -6,7 +6,17 @@
 // import { midi } from "./external/scribbletune/src/midi"
 // import { mode } from "./external/scribbletune/src/mode"
 import { chord, clip, session, scale, scales, midi, mode } from "./external/scribbletune/src"
-
+import snareFile from "./assets/snare.wav"
+import kickFile from "./assets/kick.wav"
+// PolySynth
+// PluckSynth
+// NoiseSynth *
+// MetalSynth *
+// MembraneSynth
+// AMSynth - Good one!
+// FMSynth - Great one!
+// MonoSynth - Good one!
+// Synth - Good for bass
 export const SYNTH_AM = "AMSynth"
 export const SYNTH_FM = "FMSynth"
 export const SYNTH_MONO = "MonoSynth"
@@ -19,7 +29,7 @@ const channels = session()
 // create drum track for background...
 export const createKicks = () =>{
     return channels.createChannel({
-      sample: "https://scribbletune.com/sounds/snare.wav",
+        sample: kickFile,
       clips: [
           { pattern: "x-x-" },
           { pattern: "x[xx]x" },
@@ -30,7 +40,7 @@ export const createKicks = () =>{
 }
 export const createSnares = () =>{
     return channels.createChannel({
-      sample: "https://scribbletune.com/sounds/kick.wav",
+        sample: snareFile,
       clips: [
         { pattern: "___x" },
         { pattern: "-x-x" },
@@ -47,20 +57,7 @@ export const createLead = (instrument = "PolySynth", clips=[] ) =>{
       clips
     })
 }
-    
-
-// This simply takes some text and returns some music!
-// export const convertTextToSound = (text, ) =>{
-
-//     clip({ 
-//         synth: "Synth", 
-//         notes: "c4", 
-//         pattern: "x" 
-//     }).start()
-
-//     Tone.Transport.start()
-// }
-
+  
 export const convertSentimentToSound = (sentiment) =>{
     // Pass in a Float, get out a sound?
 
@@ -90,6 +87,8 @@ export const generateSentimentSong = (sentiment) =>{
 
     return notesInScales
 }
+
+
 export const fetchScales = (note = "c4") =>{
     // Pass in a Float, get out a sound?
     const allScales = scales()
@@ -110,6 +109,15 @@ export const fetchScales = (note = "c4") =>{
     return notesInScales
 }
 
+// Give it a scale full of notes... return some chords in
+// that scale!
+export const convertScaleToChord = (scale)=>{
+    // CM-5
+    //const collection = chord()
+    // drop first one as it is *always* going to be the C4
+    return scale.slice(1,-1).join(" ")
+}
+
 export const saveMidi = (text) =>{
     
     const clip = clip({
@@ -122,15 +130,7 @@ export const saveMidi = (text) =>{
 
 export const createClip = (sentiment, instrument ="Synth") =>{
 
-    // PolySynth
-    // PluckSynth
-    // NoiseSynth *
-    // MetalSynth *
-    // MembraneSynth
-    // AMSynth - Good one!
-    // FMSynth - Great one!
-    // MonoSynth - Good one!
-    // Synth - Good for bass
+    
     return clip({
       synth: instrument,
       pattern: "-x",
