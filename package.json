@@ -1,0 +1,15 @@
+{
+  "name": "TeasAndSeas",
+  "version": "0.0.2",
+  "description": "Legal document to music convertor",
+  "main": "index.js",
+  "repository": "https://github.com/designerzen/TeasAndSeas.git",
+  "author": "designerzen <designerzen@gmail.com>",
+  "license": "Apache",
+  "private": false,
+  "devDependencies": {
+    "read-file": "^0.2.0",
+    "scribbletune": "^1.9.2",
+    "sentiment": "^5.0.1"
+  }
+}
