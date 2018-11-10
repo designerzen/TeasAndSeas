@@ -1,47 +1,51 @@
-import { chord, clip, session, scale, scales, midi, mode } from "scribbletune";
-// import Tone from 'tone'
+// import {chord } from "./external/scribbletune/src/chord"
+// import { clip } from "./external/scribbletune/src/clip"
+// import { session } from "./external/scribbletune/src/session"
+// import { scale } from "./external/scribbletune/src/scale"
+// import { scales} from "./external/scribbletune/src/scales"
+// import { midi } from "./external/scribbletune/src/midi"
+// import { mode } from "./external/scribbletune/src/mode"
+import { chord, clip, session, scale, scales, midi, mode } from "./external/scribbletune/src"
 
-// console.error(clip)
+export const SYNTH_AM = "AMSynth"
+export const SYNTH_FM = "FMSynth"
+export const SYNTH_MONO = "MonoSynth"
+export const SYNTH_GENERIC = "Synth"
+
 
 // sessions...
 const channels = session()
 
 // create drum track for background...
-export const createPercussion = () =>{
-    channels.createChannel({
-      sample: "https://scribbletune.com/sounds/kick.wav",
+export const createKicks = () =>{
+    return channels.createChannel({
+      sample: "https://scribbletune.com/sounds/snare.wav",
       clips: [
-        { pattern: "x" },
-        { pattern: "xxx[xx]" },
-        { pattern: "x" },
-        { pattern: "xxx[-x]" }
+          { pattern: "x-x-" },
+          { pattern: "x[xx]x" },
+          { pattern: "x-x-x-x" },
+          { pattern: "x_x_x_x" }
       ]
     })
 }
-
-// we need to be able to flip between clips...
-export const createLead = (instrument = "PolySynth") =>{
-    channels.createChannel({
-      synth: instrument,
+export const createSnares = () =>{
+    return channels.createChannel({
+      sample: "https://scribbletune.com/sounds/kick.wav",
       clips: [
-        { 
-            pattern: "x", 
-            notes: 'C4 D#4'
-        },
-        { 
-            pattern: "xxx[xx]", 
-            notes: 'C2 D#4' 
-        },
-        { 
-            pattern: "x", 
-            notes: 'C3 D#4' 
-        },
-        { 
-            pattern: "xxx[-x]", 
-            notes: 'C1 D#4' 
-        }
+        { pattern: "___x" },
+        { pattern: "-x-x" },
+        { pattern: "x-x-" },
+        { pattern: "_x_x" }
       ]
     });
+}
+
+// we need to be able to flip between clips...
+export const createLead = (instrument = "PolySynth", clips=[] ) =>{
+    return channels.createChannel({
+      synth: instrument,
+      clips
+    })
 }
     
 
@@ -104,7 +108,6 @@ export const fetchScales = (note = "c4") =>{
     })
 
     return notesInScales
-    
 }
 
 export const saveMidi = (text) =>{
@@ -137,7 +140,21 @@ export const createClip = (sentiment, instrument ="Synth") =>{
     })
 }
 
-export const startAudio = () =>{
-    channels.startRow(1)
+export const startAudio = ( row=1, bpm=90, callback, signature="8n" ) =>{
+
+    channels.startRow(row)
+
+    Tone.Transport.bpm.value = bpm
     Tone.Transport.start()
+
+    Tone.Transport.scheduleRepeat( (time)=> {
+
+        //do something with the time
+        callback(time)
+
+    }, signature)
+}
+
+export const changeRow = (row=1) =>{
+    channels.startRow(row)
 }
