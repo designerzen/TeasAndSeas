@@ -117,7 +117,7 @@ const run = () =>{
 
             console.log("Beat", time, nextWord)
             // update the sentiment obect...
-            elements.data.innerHTML = nextWord
+            // elements.data.innerHTML = nextWord
 
             elements.ticker.innerHTML = nextWord
             elements.ticker.className = "beat-" + bar + " " + (tock? 'tock' : 'tick')
