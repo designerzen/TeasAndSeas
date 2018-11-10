@@ -7,7 +7,7 @@
 //     })
 // }
 
-const readFile = (textFile)=>{
+export const readFile = (textFile)=>{
 
     return new Promise((resolve, reject) => {
         const client = new XMLHttpRequest()
@@ -21,5 +21,3 @@ const readFile = (textFile)=>{
         client.send()
     })
 }
-
-export default readFile

@@ -1,20 +1,30 @@
 
-import Sentiment from 'sentiment'
 
-import readFile from './read-file'
+import {readFile} from './read-file'
+import {analyse} from './sentiment-analyser'
 
-const textfile = "./tc-stripped.txt"
+//import text from "./assets/tc-stripped.js"
+
+const textfile = "./assets/tc-stripped.js"
 
 //import text from "./tx-stripped.txt"
 console.log("Reading Ts and Cs")
+console.log("readFile", readFile)
+console.log("analyse", analyse)
 
-readFile(textfile).next(
+readFile(textfile).then(
     text => {
-    console.log(text)
+        console.log(text)
+        return analyse(text)
+    }
+).then(
+    analysedText=>{
+
     }
 )
 
-// Analyze sentiments!
-const sentiment = new Sentiment();
-const result = sentiment.analyze('Cats are stupid.');
-console.dir(result);    // Score: -2, Comparative: -0.666
+analyse().then( results =>{
+    console.table(results)
+})
+
+// console.dir(result)    // Score: -2, Comparative: -0.666
