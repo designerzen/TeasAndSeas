@@ -1,9 +1,7 @@
 import { chord, clip, session, scale, scales, midi, mode } from "scribbletune";
-import Tone from 'tone'
+// import Tone from 'tone'
 
-window.Tone = Tone
-
-console.error(clip)
+// console.error(clip)
 
 // sessions...
 const channels = session()

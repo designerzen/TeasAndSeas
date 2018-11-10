@@ -6,6 +6,7 @@ import textFile from "./assets/tc-stripped.txt"
 import {readFile} from './read-file'
 import {analyse} from './sentiment-analyser'
 
+// window.Tone = Tone
 // import {convertTextToSound } from './audio'
 import {
     generateSentimentSong,
@@ -73,3 +74,4 @@ const run = () =>{
 
 
 setTimeout( run, 440 )
+
