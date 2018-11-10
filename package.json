@@ -9,6 +9,8 @@
   "private": false,
   "devDependencies": {
     "parcel-bundler": "^1.10.3",
+  },
+  "dependencies": {
     "read-file": "^0.2.0",
     "scribbletune": "^1.9.2",
     "sentiment": "^5.0.1"
