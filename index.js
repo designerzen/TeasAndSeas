@@ -2,8 +2,7 @@
 //const string = fs.readFileSync(__dirname + "/test.txt", "utf8");
 //import text from './assets/tc-stripped.txt'
 import textFile from "./assets/tc-stripped.txt"
-import snareFile from "./assets/snare.wav"
-import kickFile from "./assets/kick.wav"
+
 
 import {readFile} from './read-file'
 import {analyse} from './sentiment-analyser'
@@ -11,14 +10,15 @@ import {analyse} from './sentiment-analyser'
 // import {convertTextToSound } from './audio'
 import {
     SYNTH_AM, SYNTH_FM, SYNTH_MONO, SYNTH_GENERIC,
-  generateSentimentSong,
-  fetchScales,
-  startAudio,
-  createClip,
-  createLead,
+    generateSentimentSong,
+    fetchScales,
+    startAudio,
+    createClip,
+    createLead,
     createKicks,
     createSnares,
-  changeRow
+    convertScaleToChord,
+    changeRow
 } from "./audio"
 
 //const file = __dirname + text
@@ -36,6 +36,10 @@ let word = 0
 let lead
 let kicks
 let snares
+let clips
+
+const c4 = fetchScales("c4")
+const g4 = fetchScales("g4")
 
 const elements = {
     ticker: document.getElementById('ticker'),
@@ -66,38 +70,58 @@ const run = () =>{
 
             //console.table(analysedText)
             progress = 2 / STEPS
-            // so now we create our 
-            return fetchScales()
+            // so now we create our various scales...
+            
+            return {
+                c4,g4
+            }
         }
 
     ).then( allScales => {
 
         progress = 3 / STEPS
 
-        lead = createLead(
-            SYNTH_FM,
-            [
+        // Here we create our scales from super sad to not too bad...
+        const bluesMajor = allScales["g4"]["major blues"]
+        const bluesMinor = allScales["g4"]["minor blues"]
+        const augmented = allScales["c4"]["augmented"]
 
-                // SAD
-                {
-                    pattern: "xxxxx",
-                    notes: 'C4 D#4'
-                },
-                {
-                    pattern: "xxx[xx]",
-                    notes: 'C2 D#4'
-                },
-                {
-                    pattern: "x-x-x-x",
-                    notes: 'C3 D#4'
-                },
-                // HAPPY
-                {
-                    pattern: "xxx[-x]",
-                    notes: 'C1 D#4'
-                }
-            ]
+        const scaleRange = [
+            convertScaleToChord(bluesMinor), 
+            convertScaleToChord(bluesMajor), 
+            convertScaleToChord(augmented)
+        ]
+
+        clips = [
+            // SAD
+            {
+                pattern: "xxxxx",
+                notes: scaleRange[0]
+            },
+            {
+                pattern: "xxx[xx]",
+                notes: scaleRange[1]
+            },
+            {
+                pattern: "x-x-x-x",
+                notes: scaleRange[2]
+            },
+            // HAPPY
+            {
+                pattern: "xxx[-x]",
+                notes: 'C1 D#4'
+            }
+        ]
+
+
+        console.table(scaleRange);
+        console.table(clips);
+
+        lead = createLead(
+            SYNTH_AM,
+           clips
         )
+
         kicks = createKicks()
         snares = createSnares()
 
@@ -108,6 +132,7 @@ const run = () =>{
         //console.log(lead)
 
         startAudio(1, BPM, time=>{
+
             const tock = bar++%2 === 0
             const nextWord = words[word++]
 
@@ -132,9 +157,7 @@ const run = () =>{
             // }else{
             //     console.error('fucked')
             // }
-            
-            
-            
+               
         })
 
     })
