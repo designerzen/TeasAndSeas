@@ -1,4 +1,4 @@
-	console.log('hello')
+	console.log('hello');
 
 	var Sentiment = require('sentiment');
 	var sentiment = new Sentiment();
