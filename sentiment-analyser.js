@@ -1,4 +1,4 @@
-import Sentiment from "sentiment";
+import Sentiment from "./external/sentiment";
 
 
 export const analyse = ()=>{
