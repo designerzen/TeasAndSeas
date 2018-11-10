@@ -9,11 +9,14 @@
   "private": false,
   "devDependencies": {
     "parcel-bundler": "^1.10.3",
-    "sass": "^1.14.3"
+    "sass": "^1.14.3",
+    "tone": "^0.12.80"
   },
   "dependencies": {
     "read-file": "^0.2.0",
-    "scribbletune": "^1.9.2",
     "sentiment": "^5.0.1"
+  },
+  "scripts": {
+    "start": "parcel index.html"
   }
 }

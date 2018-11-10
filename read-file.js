@@ -7,13 +7,22 @@
 //     })
 // }
 
-const readFile = (textFile)=>{
+export const readFile = (textFile)=>{
+
+    console.error("Reading file", textFile)
 
     return new Promise((resolve, reject) => {
         const client = new XMLHttpRequest()
         client.open("GET", textFile)
-        client.onreadystatechange = () => {
-            resolve(client.responseText)
+        client.onreadystatechange = state => {
+            // check for state 4
+            const response = client.responseText
+            //console.error(state, response)
+        
+            if (state.currentTarget.readyState === 4 && response.length) 
+            {
+              resolve(response)
+            } 
         }
         client.onerror = (error)=>{
             reject(error)
@@ -21,5 +30,3 @@ const readFile = (textFile)=>{
         client.send()
     })
 }
-
-export default readFile
