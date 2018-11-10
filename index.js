@@ -22,11 +22,19 @@ const file = textFile
 
 console.log("Reading Ts and Cs from", file )
 
+const BPM = 100
 const STEPS = 4
 let progress = 0
+let bar = 0
+let words = []
+let word = 0
 
 let lead
 let drums
+
+const elements = {
+    ticker: document.getElementById('ticker')
+}
 
 const run = () =>{
 
@@ -36,7 +44,7 @@ const run = () =>{
 
             // first split text by sentence...
             const sentences = text.split('.')
-            const words = text.split(" ")
+            words = text.split(" ")
 
             console.error("Text > ", { text, sentences, words })
 
@@ -74,8 +82,13 @@ const run = () =>{
 //console.log(lead)
 
 
-        startAudio(1, 10, time=>{
-            console.log("Beat", time)
+        startAudio(1, BPM, time=>{
+            const tock = bar++%2 === 0
+            const nextWord = words[word++]
+
+            console.log("Beat", time, nextWord)
+            elements.ticker.innerHTML = nextWord
+            elements.ticker.className = "beat-" + bar + " " + (tock? 'tock' : 'tick')
         })
         
 
