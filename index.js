@@ -75,7 +75,7 @@ const run = () =>{
         progress = 3 / STEPS
 
         lead = createLead(
-            
+            SYNTH_FM,
             [
 
                 // SAD
