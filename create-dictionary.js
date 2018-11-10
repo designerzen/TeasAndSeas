@@ -15,7 +15,8 @@ console.log(txt.split(' ').length)
 
 // console.log('fudflkjdf')
 
-const words = txt.split(' ')
+
+const words = Array.from(new Set(txt.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(' ')))
 // const result = sentenses.map(s => sentiment.analyze(s))
 const object = words.reduce((obj, curr) => {
     return {
