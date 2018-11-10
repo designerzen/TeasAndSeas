@@ -21,10 +21,7 @@ export const SYNTH_AM = "AMSynth"
 export const SYNTH_FM = "FMSynth"
 export const SYNTH_MONO = "MonoSynth"
 export const SYNTH_GENERIC = "Synth"
- 
-import Tone from 'tone'
 
-window.Tone = Tone
 
 // sessions...
 const channels = session()

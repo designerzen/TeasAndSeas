@@ -7,6 +7,7 @@ import textFile from "./assets/tc-stripped.txt"
 import {readFile} from './read-file'
 import {analyse} from './sentiment-analyser'
 
+// window.Tone = Tone
 // import {convertTextToSound } from './audio'
 import {
     SYNTH_AM, SYNTH_FM, SYNTH_MONO, SYNTH_GENERIC,
@@ -141,7 +142,7 @@ const run = () =>{
 
             console.log("Beat", time, nextWord)
             // update the sentiment obect...
-            elements.data.innerHTML = nextWord
+            // elements.data.innerHTML = nextWord
 
             elements.ticker.innerHTML = nextWord
             elements.ticker.className = "beat-" + bar + " " + (tock? 'tock' : 'tick')
