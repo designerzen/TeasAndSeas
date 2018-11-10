@@ -1,38 +1,75 @@
 // Parcel requires absolute imports for lazy loaded files
 //const string = fs.readFileSync(__dirname + "/test.txt", "utf8");
 //import text from './assets/tc-stripped.txt'
-import text from "./assets/tc-stripped.txt"
+import textFile from "./assets/tc-stripped.txt"
 
 import {readFile} from './read-file'
 import {analyse} from './sentiment-analyser'
 
 // import {convertTextToSound } from './audio'
-import { generateSentimentSong } from "./audio"
+import {
+    generateSentimentSong,
+    fetchScales,
+    startAudio,
+    createClip, 
+    createLead,
+    createPercussion
+} from "./audio"
+
 //const file = __dirname + text
-const file = text
+const file = textFile
+
 console.log("Reading Ts and Cs from", file )
 
-readFile(file).then(
-    text => {
-        console.log(text)
-        return analyse(text)
-    }
-).then(
+const STEPS = 4
+let progress = 0
 
-    analysedText=>{
+const run = () =>{
 
-        // first split text by sentence...
-        const sentences = text.split('.')
-        const words = text.split(" ")
+    readFile(file).then(
 
-        console.table(analysedText)
+        text => {
 
-        console.error("Text > ", sentences, words)
+            // first split text by sentence...
+            const sentences = text.split('.')
+            const words = text.split(" ")
 
-        return generateSentimentSong(0)
-    }
+            console.error("Text > ", { text, sentences, words })
 
-).catch( error =>{
+            progress = 1 / STEPS
 
-    console.error(error)
-})
+            return analyse(text)
+        }
+
+    ).then(
+
+        // This is an array of sentiments...
+        analysedText => {
+
+            //console.table(analysedText)
+            progress = 2 / STEPS
+            // so now we create our 
+            return fetchScales()
+        }
+
+    ).then(scales => {
+
+        progress = 3 / STEPS
+        console.log("Audio READY!", scales)
+
+        // const clip = createClip()
+        // clip.start()
+
+        createLead()
+        createPercussion()
+        startAudio()
+
+    })
+    .catch(error => {
+
+        console.error(error)
+    })
+}
+
+
+setTimeout( run, 440 )
