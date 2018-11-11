@@ -612,19 +612,25 @@ html,body{
 }
 
 body {
-  display: grid;
+  display: flex;
   justify-content: center;
   align-items: center;
 }
 
 #ticker{
 
-  transition: all 0.5s ease;
+  transition: color 295ms ease-out,background-color 195ms ease-out;
 
   &.tick{
-    background:purple;
+    background:black;
+    color:white;
   }
   &.tock{
-    background:yellow;
+    background:white;
+    color:black;
   }
+}
+
+#data{
+  display: none;
 }

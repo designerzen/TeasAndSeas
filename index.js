@@ -26,7 +26,7 @@ import {
 const file = textFile
 
 // Settings
-const BPM = 100
+const BPM = 72
 const STEPS = 4
 
 // holder of data
@@ -39,6 +39,7 @@ let progress = 0
 let bar = 0
 let word = 0
 let sentence = 0
+let smoothSentiment = 0
 
 let lead
 let kicks
@@ -163,6 +164,8 @@ const run = () =>{
 
             sentence++
 
+            smoothSentiment += currentSentiment.score > 0 ? 1 : -1
+
             // if (sentiment === happy)
             // {
             //     changeRow(0)
@@ -174,12 +177,17 @@ const run = () =>{
             // to change sentiment...
             // changeRow(test++)
 
-            console.log("Beat", time, currentWord)
+            // TODO: 
+            // When sentence > sentences.length : RESET!
+
+            console.log("Timestamp:", time, currentSentence, currentSentiment.score, smoothSentiment);
             // update the sentiment obect...
-            elements.data.innerHTML = JSON.stringify( currentSentiment )
+            //elements.data.innerHTML = JSON.stringify( currentSentiment )
+            elements.data.innerHTML = currentSentiment.score + " -> " + smoothSentiment
             //.score
 
-            elements.ticker.innerHTML = currentWord
+            //elements.ticker.innerHTML = currentWord
+            elements.ticker.innerHTML = currentSentence
             elements.ticker.className = "beat-" + bar + " " + (tock? 'tock' : 'tick')
         })
         
