@@ -68,11 +68,11 @@ export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zir
           speech.text = text
 
 
-            console.error("specific voices", {
-              speech, lang,
-              name,
-              voices
-            });
+            // console.error("specific voices", {
+            //   speech, lang,
+            //   name,
+            //   voices
+            // });
 
 
           window.speechSynthesis.speak(speech)
