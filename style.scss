@@ -622,20 +622,25 @@ body {
 
 #ticker{
 
-  
   transition: color 45ms ease-out;
   color:white;
+  padding:14px 18px;
 
   &.tick{
     //color:white;
+    animation-name: fade-in;
   }
   &.tock{
     // background:white;
     // color:black;
+    animation-name: fade-in; 
   }
 
   &.happy{
-    
+    // here we have determined that the overall sentiment is 
+    // positive and that the user should be informed that there
+    // is nothing to worry about...
+    text-decoration: underline;
   }
 
   &.unhappy{
@@ -647,4 +652,33 @@ body {
 
 #data{
   display: none;
+}
+
+#go{
+  border-radius:4px;
+  cursor: pointer;
+  padding:18px;
+  border:1px solid black;
+  transition: color 195ms ease-out,background-color 195ms ease-out;
+
+  &:hover{
+    color:black;
+    background: white;
+    border:1px solid black;
+  }
+}
+
+.show{
+  visibility: visible;
+  display: block;
+}
+
+.hide{
+  visibility: hidden;
+  display: none;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }

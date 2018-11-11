@@ -25,8 +25,11 @@ import {say} from "./speech"
 const file = textFile
 
 // Settings
-const BPM = 72*1.5
+const BPM = 38
 const STEPS = 4
+const SPEECH_VOLUME = 1
+// In decibels!
+const audioVolume = -14
 
 // holder of data
 let words = []
@@ -52,12 +55,18 @@ const d3 = fetchScales("d2")
 
 const elements = {
     ticker: document.getElementById('ticker'),
-    data: document.getElementById('data')
+    data: document.getElementById('data'),
+    goButton: document.getElementById('go'),
+    words: document.getElementById('words')
 }
 
 const run = () =>{
 
     console.log("Reading Ts and Cs from", file)
+
+
+
+
 
     readFile(file).then(
 
@@ -83,8 +92,8 @@ const run = () =>{
            
             sentiments = analysedText
 
-            console.table(sentiments)
-            console.table(sentences)
+            // console.table(sentiments)
+            // console.table(sentences)
 
 
             //console.table(analysedText)
@@ -116,7 +125,7 @@ const run = () =>{
         clips = [
             // SAD
             {
-                pattern: "xxxxx",
+                pattern: "x[xx]x_",
                 notes: scaleRange[0]
             },
             {
@@ -155,12 +164,15 @@ const run = () =>{
 
         // LOOP
         // This happens evrey bar
-        startAudio(1, BPM, time=>{
+        startAudio(1, BPM, audioVolume, time=>{
 
             const tock = bar++%2 === 0
-            const currentWord = words[word]
-
+            const currentWord = words[word].replace(/[\,|\.|\(|\)]/,"")
+            const currentWordLength = currentWord.length
+            
             // sentiments[word]
+            const nextWord = words[word+1]
+            const nextWordLength = nextWord.length;
 
             const currentSentence = sentences[sentence]
             //const currentSentiment = sentiments[sentence]
@@ -200,23 +212,37 @@ const run = () =>{
             // update the sentiment obect...
             //elements.data.innerHTML = JSON.stringify( currentSentiment )
             elements.data.innerHTML = currentSentiment.score + " -> " + smoothSentiment
-            elements.ticker.innerHTML = currentWord
+            elements.ticker.innerHTML = currentWord;
             // elements.ticker.innerHTML = currentSentence
             // elements.ticker.innerHTML = currentSentence
 
             const classes = ["beat-" + bar, tock ? 'tock' : 'tick' ]
+            let pitch = 1
 
             if (veryHappy)
             {
                 classes.push("happy")
+                pitch = 2
             }
 
             if (veryUnhappy)
             {
                 classes.push("unhappy")
+                pitch = 1
             }
 
-            elements.ticker.className = classes.join(" ")
+            elements.ticker.className = classes.join(" ");
+
+            const rate = currentWordLength > 9 ? 9 : currentWordLength
+            
+
+            console.log("speech", { rate, pitch, SPEECH_VOLUME }, currentWord);
+
+            say(currentWord, SPEECH_VOLUME, rate, pitch).then(
+              p => {
+                  console.log("speech ended", { rate, pitch, SPEECH_VOLUME }, currentWordLength );
+              }
+            )
         })
         
 
@@ -240,5 +266,18 @@ const run = () =>{
 }
 
 
-setTimeout( run, 440 )
 
+elements.words.className = "hide"
+
+elements.goButton.addEventListener('mousedown', ()=>{
+
+
+    // hide button
+    elements.words.className = "show"
+    elements.goButton.className += " hide"
+
+
+    console.log("Go Button")
+    setTimeout(run, 0)
+
+})
