@@ -25,7 +25,7 @@ import {say} from "./speech"
 const file = textFile
 
 // Settings
-const BPM = 34
+const BPM = 36
 const STEPS = 4
 const SPEECH_VOLUME = 1
 // In decibels!
@@ -229,7 +229,20 @@ const run = () =>{
             if (veryUnhappy)
             {
                 classes.push("unhappy")
-                pitch = 1
+                pitch = 0
+            }
+
+            const lowerCased = currentWord.toLowerCase()
+            
+            // extra special mode!
+            if (lowerCased === "exploited")
+            {
+                classes.push("fuck-you")
+            }
+
+            if (lowerCased === "waive") 
+            {
+              classes.push("fuck-you")
             }
 
             elements.ticker.className = classes.join(" ");
@@ -237,11 +250,11 @@ const run = () =>{
             const rate = currentWordLength > 9 ? 9 : currentWordLength
             
 
-            console.log("speech", { rate, pitch, SPEECH_VOLUME }, currentWord);
+            //console.log("speech", { rate, pitch, SPEECH_VOLUME }, currentWord);
 
             say(currentWord, SPEECH_VOLUME, rate, pitch).then(
               p => {
-                  console.log("speech ended", { rate, pitch, SPEECH_VOLUME }, currentWordLength );
+                  //console.log("speech ended", { rate, pitch, SPEECH_VOLUME }, currentWordLength );
               }
             )
         })
