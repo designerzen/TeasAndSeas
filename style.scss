@@ -608,14 +608,18 @@ textarea,
 }
 html,body{
   font-family: 'Work Sans', sans-serif;
+  height: 100%;
 }
+
+body {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
 #ticker{
-  position: absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  display:block;
+
+  transition: all 0.5s ease;
 
   &.tick{
     background:purple;
