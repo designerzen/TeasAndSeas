@@ -140,7 +140,48 @@ export const convertScaleToChord = (scale, filler='')=>{
     // CM-5
     //const collection = chord()
     // drop first one as it is *always* going to be the C4
-    return scale.slice(1,-1).join(" ")
+    // Then make chords of the others using the filler...
+    // Split after letters
+    let output = ''
+    const key = /[0-9]/
+    // loop through scales from index 1
+    for (let i = 1, q = scale.length; i <q; ++i)
+    {
+        const note = scale[i]
+        const isSharp = note.indexOf("#") > -1
+       
+        if (isSharp)
+        {
+            output += note
+
+        }else{
+
+            // Turn into a chord!
+            const parts = note.match(key)
+            
+            const numericalIndex = parts.index
+            
+            const wordPart = note.substring(0,numericalIndex)
+            const numberPart = note.substring(numericalIndex)
+
+            console.log({
+              parts,
+              wordPart,
+              numberPart,numericalIndex
+            });
+
+            output += wordPart + filler + numberPart
+
+        }
+
+        if (i < q-1)
+        {
+           // const numberPart = 
+            output += " "
+        }
+    }
+    return output
+    //return scale.slice(1,-1).join(" ")
 }
 
 export const saveMidi = (text) =>{

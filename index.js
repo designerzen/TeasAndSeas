@@ -25,7 +25,7 @@ import {say} from "./speech"
 const file = textFile
 
 // Settings
-const BPM = 38
+const BPM = 34
 const STEPS = 4
 const SPEECH_VOLUME = 1
 // In decibels!
@@ -116,8 +116,8 @@ const run = () =>{
         const augmentedLow = allScales["d3"]["augmented"]
 
         const scaleRange = [
-            convertScaleToChord(bluesMinor), 
-            convertScaleToChord(bluesMajor), 
+            convertScaleToChord(bluesMinor, 'm-'), 
+            convertScaleToChord(bluesMajor, 'M-'), 
             convertScaleToChord(augmented),
             convertScaleToChord(augmentedLow)
         ]
@@ -203,7 +203,8 @@ const run = () =>{
             // }
 
             // to change sentiment...
-            // changeRow(test++)
+            // const step = smoothSentiment < 0 ? 0 : smoothSentiment > 3 ? 3 : smoothSentiment
+            // changeRow(smoothSentiment)
 
             // TODO: 
             // When sentence > sentences.length : RESET!
@@ -279,5 +280,4 @@ elements.goButton.addEventListener('mousedown', ()=>{
 
     console.log("Go Button")
     setTimeout(run, 0)
-
 })
