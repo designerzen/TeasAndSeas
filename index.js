@@ -167,96 +167,108 @@ const run = () =>{
         startAudio(1, BPM, audioVolume, time=>{
 
             const tock = bar++%2 === 0
-            const currentWord = words[word].replace(/[\,|\.|\(|\)]/,"")
-            const currentWordLength = currentWord.length
-            
-            // sentiments[word]
-            const nextWord = words[word+1]
-            const nextWordLength = nextWord.length;
+            const ending = word === words.length-1
 
-            const currentSentence = sentences[sentence]
-            //const currentSentiment = sentiments[sentence]
-            const currentSentiment = sentiments[word]
-            const score = currentSentiment ? currentSentiment.score : 0
-
-            // general feeling...
-            const happy = score > 0
-            const unhappy = score < 0
-
-            // absolute feeling...
-            const veryHappy = score > 1
-            const veryUnhappy = score < -1
-
-            // increment list items
-            word++
-            sentence++
-
-            // smoothing
-            smoothSentiment += score > 0 ? 1 : -1
-
-            // if (sentiment === happy)
-            // {
-            //     changeRow(0)
-            // }else if (sentiment === sad)
-            // {
-            //     changeRow(4)
-            // }
-
-            // to change sentiment...
-            // const step = smoothSentiment < 0 ? 0 : smoothSentiment > 3 ? 3 : smoothSentiment
-            // changeRow(smoothSentiment)
-
-            // TODO: 
-            // When sentence > sentences.length : RESET!
-
-            console.log("Timestamp:", time, currentWord, currentSentiment.score)
-            // update the sentiment obect...
-            //elements.data.innerHTML = JSON.stringify( currentSentiment )
-            elements.data.innerHTML = currentSentiment.score + " -> " + smoothSentiment
-            elements.ticker.innerHTML = currentWord;
-            // elements.ticker.innerHTML = currentSentence
-            // elements.ticker.innerHTML = currentSentence
-
-            const classes = ["beat-" + bar, tock ? 'tock' : 'tick' ]
-            let pitch = 1
-
-            if (veryHappy)
+            if (ending)
             {
-                classes.push("happy")
-                pitch = 2
+
+                // no words left so reset all for next bar!
+                word = 0
+                bar = 0
+                sentence = 0
+
+            }else{
+
+
+                const currentWord = words[word].replace(/[\,|\.|\(|\)]/, "")
+                const currentWordLength = currentWord.length
+
+                // sentiments[word]
+                // const nextWord = words[word+1]
+                // const nextWordLength = nextWord.length;
+
+                const currentSentence = sentences[sentence]
+                //const currentSentiment = sentiments[sentence]
+                const currentSentiment = sentiments[word]
+                const score = currentSentiment ? currentSentiment.score : 0
+
+                // general feeling...
+                const happy = score > 0
+                const unhappy = score < 0
+
+                // absolute feeling...
+                const veryHappy = score > 1
+                const veryUnhappy = score < -1
+
+                // increment list items
+                word++
+                sentence++
+
+                // smoothing
+                smoothSentiment += score > 0 ? 1 : -1
+
+                // if (sentiment === happy)
+                // {
+                //     changeRow(0)
+                // }else if (sentiment === sad)
+                // {
+                //     changeRow(4)
+                // }
+
+                // to change sentiment...
+                // const step = smoothSentiment < 0 ? 0 : smoothSentiment > 3 ? 3 : smoothSentiment
+                // changeRow(smoothSentiment)
+
+                // TODO: 
+                // When sentence > sentences.length : RESET!
+
+                console.log("Timestamp:", time, currentWord, currentSentiment.score)
+                // update the sentiment obect...
+                //elements.data.innerHTML = JSON.stringify( currentSentiment )
+                elements.data.innerHTML = currentSentiment.score + " -> " + smoothSentiment
+                elements.ticker.innerHTML = currentWord;
+                // elements.ticker.innerHTML = currentSentence
+                // elements.ticker.innerHTML = currentSentence
+
+                const classes = ["beat-" + bar, tock ? 'tock' : 'tick']
+                let pitch = 1
+
+                if (veryHappy) {
+                    classes.push("happy")
+                    pitch = 2
+                }
+
+                if (veryUnhappy) {
+                    classes.push("unhappy")
+                    pitch = 0
+                }
+
+                const lowerCased = currentWord.toLowerCase()
+
+                // extra special mode!
+                if (lowerCased === "exploited") {
+                    classes.push("fuck-you")
+                }
+
+                if (lowerCased === "waive") {
+                    classes.push("fuck-you")
+                }
+
+                elements.ticker.className = classes.join(" ");
+
+                const rate = currentWordLength > 9 ? 9 : currentWordLength
+
+
+                //console.log("speech", { rate, pitch, SPEECH_VOLUME }, currentWord);
+
+                say(currentWord, SPEECH_VOLUME, rate, pitch).then(
+                    p => {
+                        //console.log("speech ended", { rate, pitch, SPEECH_VOLUME }, currentWordLength );
+                    }
+                )
+
             }
 
-            if (veryUnhappy)
-            {
-                classes.push("unhappy")
-                pitch = 0
-            }
-
-            const lowerCased = currentWord.toLowerCase()
-            
-            // extra special mode!
-            if (lowerCased === "exploited")
-            {
-                classes.push("fuck-you")
-            }
-
-            if (lowerCased === "waive") 
-            {
-              classes.push("fuck-you")
-            }
-
-            elements.ticker.className = classes.join(" ");
-
-            const rate = currentWordLength > 9 ? 9 : currentWordLength
-            
-
-            //console.log("speech", { rate, pitch, SPEECH_VOLUME }, currentWord);
-
-            say(currentWord, SPEECH_VOLUME, rate, pitch).then(
-              p => {
-                  //console.log("speech ended", { rate, pitch, SPEECH_VOLUME }, currentWordLength );
-              }
-            )
         })
         
 
