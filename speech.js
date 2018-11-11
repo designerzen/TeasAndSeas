@@ -44,8 +44,6 @@ export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zir
 
           const person = voices[0]
 
-          console.error("specific voices", { lang, name, voices });
-
           const speech = new SpeechSynthesisUtterance()
 
           speech.lang = 'en-US'
@@ -69,6 +67,14 @@ export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zir
           speech.pitch = pitch
           speech.text = text
 
+
+            console.error("specific voices", {
+              speech, lang,
+              name,
+              voices
+            });
+
+
           window.speechSynthesis.speak(speech)
 
         }
@@ -76,7 +82,7 @@ export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zir
 
       // in some ways this is a fudge factor as the voices
       // aren't always known about on DOM available
-      setTimeout(talk, 200)
+      setTimeout(talk,0)
     }
   })
 }

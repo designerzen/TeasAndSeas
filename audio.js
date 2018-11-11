@@ -46,9 +46,9 @@ export const createKicks = () =>{
         sample: kickFile,
         clips: [
             // SAD
-          { pattern: "x-x-" },
-          { pattern: "x[xx]x" },
-          { pattern: "x-x-x-x" },
+            { pattern: "[xxxx][xxxx][xxxx][xxxx]" },
+            { pattern: "[xxxx][xx][xxxx][xx]" },
+            { pattern: "[xxxx][xx][xxxx][xx]" },
           { pattern: "xxxx" }
           // HAPPY
       ]
@@ -59,10 +59,10 @@ export const createSnares = () =>{
     sample: snareFile,
       clips: [
           // SAD
-        { pattern: "___x" },
-        { pattern: "-x-x" },
-          { pattern: "x-[xx]-" },
-        { pattern: "xxxx" }
+        { pattern: "xxxx" },
+        { pattern: "x_x_" },
+          { pattern: "_x_x" },
+        { pattern: "[xxxx]" }
         // HAPPY
       ]
     });
@@ -165,11 +165,12 @@ export const createClip = (sentiment, instrument ="Synth") =>{
     })
 }
 
-export const startAudio = ( row=1, bpm=90, callback, signature="8n" ) =>{
+export const startAudio = (row = 1, bpm = 90, volume=1, callback, signature="8n" ) =>{
 
     channels.startRow(row)
 
     Tone.Transport.bpm.value = bpm
+    Tone.Master.volume.value = volume
     Tone.Transport.start()
 
     Tone.Transport.scheduleRepeat( (time)=> {
