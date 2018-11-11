@@ -1,26 +1,25 @@
 // Parcel requires absolute imports for lazy loaded files
 //const string = fs.readFileSync(__dirname + "/test.txt", "utf8");
-//import text from './assets/tc-stripped.txt'
 import textFile from "./assets/tc-stripped.txt"
-
 
 import {readFile} from './read-file'
 import {analyse} from './sentiment-analyser'
 
-// window.Tone = Tone
 // import {convertTextToSound } from './audio'
 import {
     SYNTH_AM, SYNTH_FM, SYNTH_MONO, SYNTH_GENERIC,
     generateSentimentSong,
     fetchScales,
     startAudio,
-    createClip,
+    createClip, createPiano,
     createLead,
     createKicks,
     createSnares,
     convertScaleToChord,
     changeRow
 } from "./audio"
+
+import {say} from "./speech"
 
 //const file = __dirname + text
 const file = textFile
@@ -44,6 +43,7 @@ let smoothSentiment = 0
 let lead
 let kicks
 let snares
+let piano
 let clips
 
 const c4 = fetchScales("c2")
@@ -58,7 +58,6 @@ const elements = {
 const run = () =>{
 
     console.log("Reading Ts and Cs from", file)
-
 
     readFile(file).then(
 
@@ -146,6 +145,7 @@ const run = () =>{
 
         kicks = createKicks()
         snares = createSnares()
+        piano = createPiano(clips)
 
         console.log("Audio READY!", { allScales, lead, kicks});
 
@@ -165,11 +165,22 @@ const run = () =>{
             const currentSentence = sentences[sentence]
             //const currentSentiment = sentiments[sentence]
             const currentSentiment = sentiments[word]
+            const score = currentSentiment ? currentSentiment.score : 0
 
+            // general feeling...
+            const happy = score > 0
+            const unhappy = score < 0
+
+            // absolute feeling...
+            const veryHappy = score > 1
+            const veryUnhappy = score < -1
+
+            // increment list items
             word++
             sentence++
 
-            smoothSentiment += currentSentiment.score > 0 ? 1 : -1
+            // smoothing
+            smoothSentiment += score > 0 ? 1 : -1
 
             // if (sentiment === happy)
             // {
@@ -184,17 +195,28 @@ const run = () =>{
 
             // TODO: 
             // When sentence > sentences.length : RESET!
-// smoothSentiment
-            console.log("Timestamp:", time, currentWord, currentSentiment.score);
+
+            console.log("Timestamp:", time, currentWord, currentSentiment.score)
             // update the sentiment obect...
             //elements.data.innerHTML = JSON.stringify( currentSentiment )
             elements.data.innerHTML = currentSentiment.score + " -> " + smoothSentiment
-            //.score
-
             elements.ticker.innerHTML = currentWord
             // elements.ticker.innerHTML = currentSentence
             // elements.ticker.innerHTML = currentSentence
-            elements.ticker.className = "beat-" + bar + " " + (tock? 'tock' : 'tick')
+
+            const classes = ["beat-" + bar, tock ? 'tock' : 'tick' ]
+
+            if (veryHappy)
+            {
+                classes.push("happy")
+            }
+
+            if (veryUnhappy)
+            {
+                classes.push("unhappy")
+            }
+
+            elements.ticker.className = classes.join(" ")
         })
         
 
@@ -218,5 +240,5 @@ const run = () =>{
 }
 
 
-setTimeout( run, 0 )
+setTimeout( run, 440 )
 

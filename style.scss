@@ -633,6 +633,16 @@ body {
     // background:white;
     // color:black;
   }
+
+  &.happy{
+    
+  }
+
+  &.unhappy{
+    background:white;
+    color:black;
+    font-style:bold;
+  }
 }
 
 #data{
