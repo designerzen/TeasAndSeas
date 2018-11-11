@@ -25,22 +25,29 @@ import {
 //const file = __dirname + text
 const file = textFile
 
-console.log("Reading Ts and Cs from", file )
-
+// Settings
 const BPM = 100
 const STEPS = 4
+
+// holder of data
+let words = []
+let sentences = []
+let sentiments = []
+
+// counters
 let progress = 0
 let bar = 0
-let words = []
 let word = 0
+let sentence = 0
 
 let lead
 let kicks
 let snares
 let clips
 
-const c4 = fetchScales("c4")
-const g4 = fetchScales("g4")
+const c4 = fetchScales("c3")
+const g2 = fetchScales("g2")
+const d3 = fetchScales("d3")
 
 const elements = {
     ticker: document.getElementById('ticker'),
@@ -49,19 +56,22 @@ const elements = {
 
 const run = () =>{
 
+    console.log("Reading Ts and Cs from", file)
+
+
     readFile(file).then(
 
         text => {
 
             // first split text by sentence...
-            const sentences = text.split('.')
+            sentences = text.split(/[.|,]/)
             words = text.split(" ")
 
             console.error("Text > ", { text, sentences, words })
 
             progress = 1 / STEPS
 
-            return analyse(text)
+            return analyse(sentences)
         }
 
     ).then(
@@ -69,12 +79,19 @@ const run = () =>{
         // This is an array of sentiments...
         analysedText => {
 
+           
+            sentiments = analysedText
+
+            console.table(sentiments)
+            console.table(sentences)
+
+
             //console.table(analysedText)
             progress = 2 / STEPS
             // so now we create our various scales...
             
             return {
-                c4,g4
+                c4, g2, d3
             }
         }
 
@@ -83,14 +100,16 @@ const run = () =>{
         progress = 3 / STEPS
 
         // Here we create our scales from super sad to not too bad...
-        const bluesMajor = allScales["g4"]["major blues"]
-        const bluesMinor = allScales["g4"]["minor blues"]
+        const bluesMajor = allScales["g2"]["major blues"]
+        const bluesMinor = allScales["g2"]["minor blues"]
         const augmented = allScales["c4"]["augmented"]
+        const augmentedLow = allScales["d3"]["augmented"]
 
         const scaleRange = [
             convertScaleToChord(bluesMinor), 
             convertScaleToChord(bluesMajor), 
-            convertScaleToChord(augmented)
+            convertScaleToChord(augmented),
+            convertScaleToChord(augmentedLow)
         ]
 
         clips = [
@@ -110,7 +129,7 @@ const run = () =>{
             // HAPPY
             {
                 pattern: "xxx[-x]",
-                notes: 'C1 D#4'
+                notes: scaleRange[3]
             }
         ]
 
@@ -135,16 +154,32 @@ const run = () =>{
         startAudio(1, BPM, time=>{
 
             const tock = bar++%2 === 0
-            const nextWord = words[word++]
+            const currentWord = words[word++]
+
+            // sentiments[word]
+
+            const currentSentence = sentences[sentence]
+            const currentSentiment = sentiments[sentence]
+
+            sentence++
+
+            // if (sentiment === happy)
+            // {
+            //     changeRow(0)
+            // }else if (sentiment === sad)
+            // {
+            //     changeRow(4)
+            // }
 
             // to change sentiment...
-            //changeRow(test++)
+            // changeRow(test++)
 
-            console.log("Beat", time, nextWord)
+            console.log("Beat", time, currentWord)
             // update the sentiment obect...
-            // elements.data.innerHTML = nextWord
+            elements.data.innerHTML = JSON.stringify( currentSentiment )
+            //.score
 
-            elements.ticker.innerHTML = nextWord
+            elements.ticker.innerHTML = currentWord
             elements.ticker.className = "beat-" + bar + " " + (tock? 'tock' : 'tick')
         })
         

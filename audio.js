@@ -30,22 +30,26 @@ const channels = session()
 export const createKicks = () =>{
     return channels.createChannel({
         sample: kickFile,
-      clips: [
+        clips: [
+            // SAD
           { pattern: "x-x-" },
           { pattern: "x[xx]x" },
           { pattern: "x-x-x-x" },
-          { pattern: "x_x_x_x" }
+          { pattern: "xxxx" }
+          // HAPPY
       ]
     })
 }
 export const createSnares = () =>{
     return channels.createChannel({
-        sample: snareFile,
+    sample: snareFile,
       clips: [
+          // SAD
         { pattern: "___x" },
         { pattern: "-x-x" },
         { pattern: "x-x-" },
-        { pattern: "_x_x" }
+        { pattern: "xxxx" }
+        // HAPPY
       ]
     });
 }
@@ -98,7 +102,7 @@ export const fetchScales = (note = "c4") =>{
     allScales.forEach( scaleName => {
         try{
             const scale = mode(`${note} ${scaleName}`)
-            console.log(scale)
+            //console.log(scale)
             notesInScales[scaleName] = scale
         }catch(error){
             console.error(error)
@@ -111,7 +115,7 @@ export const fetchScales = (note = "c4") =>{
 
 // Give it a scale full of notes... return some chords in
 // that scale!
-export const convertScaleToChord = (scale)=>{
+export const convertScaleToChord = (scale, filler='')=>{
     // CM-5
     //const collection = chord()
     // drop first one as it is *always* going to be the C4
