@@ -18,7 +18,7 @@ export const analyse = (sentences)=>{
             try {
 
                 const result = sentiment.analyze(sentence)
-                console.error(result);
+                //console.error(result);
 
                 results.push(result)
 

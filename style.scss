@@ -609,25 +609,29 @@ textarea,
 html,body{
   font-family: 'Work Sans', sans-serif;
   height: 100%;
+  background:black;
+    
 }
 
 body {
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size:5em;
 }
 
 #ticker{
 
-  transition: color 295ms ease-out,background-color 195ms ease-out;
+  
+  transition: color 45ms ease-out;
+  color:white;
 
   &.tick{
-    background:black;
-    color:white;
+    //color:white;
   }
   &.tock{
-    background:white;
-    color:black;
+    // background:white;
+    // color:black;
   }
 }
 

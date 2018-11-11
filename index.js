@@ -26,7 +26,7 @@ import {
 const file = textFile
 
 // Settings
-const BPM = 72
+const BPM = 72*1.5
 const STEPS = 4
 
 // holder of data
@@ -46,9 +46,9 @@ let kicks
 let snares
 let clips
 
-const c4 = fetchScales("c3")
-const g2 = fetchScales("g2")
-const d3 = fetchScales("d3")
+const c4 = fetchScales("c2")
+const g2 = fetchScales("g1")
+const d3 = fetchScales("d2")
 
 const elements = {
     ticker: document.getElementById('ticker'),
@@ -72,7 +72,8 @@ const run = () =>{
 
             progress = 1 / STEPS
 
-            return analyse(sentences)
+            return analyse(words);
+            //return analyse(sentences)
         }
 
     ).then(
@@ -139,7 +140,7 @@ const run = () =>{
         console.table(clips);
 
         lead = createLead(
-            SYNTH_AM,
+            SYNTH_FM,
            clips
         )
 
@@ -152,16 +153,20 @@ const run = () =>{
         //lead.startRow(1)
         //console.log(lead)
 
+        // LOOP
+        // This happens evrey bar
         startAudio(1, BPM, time=>{
 
             const tock = bar++%2 === 0
-            const currentWord = words[word++]
+            const currentWord = words[word]
 
             // sentiments[word]
 
             const currentSentence = sentences[sentence]
-            const currentSentiment = sentiments[sentence]
+            //const currentSentiment = sentiments[sentence]
+            const currentSentiment = sentiments[word]
 
+            word++
             sentence++
 
             smoothSentiment += currentSentiment.score > 0 ? 1 : -1
@@ -179,15 +184,16 @@ const run = () =>{
 
             // TODO: 
             // When sentence > sentences.length : RESET!
-
-            console.log("Timestamp:", time, currentSentence, currentSentiment.score, smoothSentiment);
+// smoothSentiment
+            console.log("Timestamp:", time, currentWord, currentSentiment.score);
             // update the sentiment obect...
             //elements.data.innerHTML = JSON.stringify( currentSentiment )
             elements.data.innerHTML = currentSentiment.score + " -> " + smoothSentiment
             //.score
 
-            //elements.ticker.innerHTML = currentWord
-            elements.ticker.innerHTML = currentSentence
+            elements.ticker.innerHTML = currentWord
+            // elements.ticker.innerHTML = currentSentence
+            // elements.ticker.innerHTML = currentSentence
             elements.ticker.className = "beat-" + bar + " " + (tock? 'tock' : 'tick')
         })
         
