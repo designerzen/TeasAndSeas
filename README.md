@@ -1,4 +1,4 @@
-# TeasAndSeas
+# Teas&Seas
 Teas and Seas is a tool that generates music from text input.
 
 It was intended to analyse the sentiment of legal documents and present their content in a musical way.
