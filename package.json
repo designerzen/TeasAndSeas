@@ -1,7 +1,7 @@
 {
   "name": "TeasAndSeas",
-  "version": "0.0.2",
-  "description": "Legal document to music convertor",
+  "version": "0.0.5",
+  "description": "Legal document to music video convertor",
   "main": "index.js",
   "repository": "https://github.com/designerzen/TeasAndSeas.git",
   "author": "designerzen <designerzen@gmail.com>",
@@ -9,14 +9,15 @@
   "private": false,
   "devDependencies": {
     "parcel-bundler": "^1.10.3",
-    "tone": "^0.12.80"
+    "sass": "^1.14.3"
   },
   "dependencies": {
-    "read-file": "^0.2.0",
-    "sentiment": "^5.0.1"
+    "sentiment": "^5.0.1",
+    "tone": "^0.12.80"
   },
   "scripts": {
-    "start": "parcel index.html",
+    "start": "parcel ./src/index.html",
+    "build": "parcel build ./src/index.html",
     "deploy": "gh-pages-deploy"
   },
   "gh-pages-deploy": {

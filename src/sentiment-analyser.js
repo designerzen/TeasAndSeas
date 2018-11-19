@@ -1,16 +1,18 @@
 import Sentiment from "./external/sentiment";
 
 
-export const analyse = (sentences)=>{
+export const analyse = (sentences, progressCallback)=>{
     return new Promise( (resolve,reject)=>{
 
         const sentiment = new Sentiment()
         const results = []
+        const quantity = sentences.length
+
         let success = true
 
         console.error(sentences)
 
-        sentences.forEach(sentence => {
+        sentences.forEach((sentence,index) => {
 
             console.error(sentence);
 
@@ -21,6 +23,8 @@ export const analyse = (sentences)=>{
                 //console.error(result);
 
                 results.push(result)
+
+                progressCallback && progressCallback(results.length / quantity, sentence, result )
 
             } catch (error) {
 

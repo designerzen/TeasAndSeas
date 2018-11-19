@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeasAndSeas</title>
+    <link rel="stylesheet" href="./style.scss" />
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.3.1/Tone.min.js"></script> -->
+</head>
+
+<body>
+
+    <main>
+       
+        <section id="start">
+
+            <header>
+                <h1>Teas &amp; Seas</h1>
+                <h2>Musical Contract Sentiment Describer</h2>
+            </header>
+
+            <p>
+                Conversion of legal documents into music videos using procedural synthesis of emotion based on sentiment analysis 
+                Source code available at github
+            </p>
+
+            <nav id="selection">
+                <h3>Select a contract</h3>
+                <ul id="presets">
+                    <li><a class="preset" href="./presets/tc-stripped.txt">RED Hackathon T &amp; C's</a></li>
+                    <li><a class="preset" href="./presets/brexit.txt">Brexit</a></li>
+                </ul>
+            
+                <form action="/" class="uploader">
+                    <label class="vi" for="uploader">Upload your own</label>
+                    <input type="file" id="uploader" placeholder="Upload a legal contract">
+                </form>
+            </nav>
+
+        </section>
+
+
+        <section id="words" class="hide">
+
+            <button id="go">Describe in the medium of a pop video</button>
+            <button id="download">Download as MIDI</button>
+                    
+            <div id="ticker">
+                <!-- Transcluded -->
+            </div>
+
+            <p id="data"></p>
+            
+            <em id="warning">Warning:May induce seizure or mild distaste</em>
+            
+        </section>
+
+
+        <section id="feedback">
+            <div id="busy">
+
+            </div>
+            <progress id="progress" min="0" max="100" value=""></progress>
+        </section>
+
+    </main>
+
+    <script src="./index.js"></script>
+</body>
+
+</html>

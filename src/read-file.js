@@ -1,15 +1,12 @@
-// import read from 'read-file'
-
 
 // export const readFile = () => {
 //     read.sync('tc.txt', 'utf8', (err, string) => {
 //         console.log(string.split(' ').length)
 //     })
 // }
-
 export const readFile = (textFile)=>{
 
-    console.error("Reading file", textFile)
+    //console.error("Reading file", textFile)
 
     return new Promise((resolve, reject) => {
         const client = new XMLHttpRequest()

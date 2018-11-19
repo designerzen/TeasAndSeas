@@ -2301,10 +2301,6 @@ jsesc@~0.5.0:
   version "0.5.0"
   resolved "http://registry.npmjs.org/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
 
-jsmidgen@~0.1.4:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/jsmidgen/-/jsmidgen-0.1.5.tgz#ad0afd6375eb12f51064025393ce3baec380585d"
-
 json-parse-better-errors@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
@@ -3501,10 +3497,6 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-read-file@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/read-file/-/read-file-0.2.0.tgz#70c6baf8842ec7d1540f981fd0e6aed4c81bd545"
-
 readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.2.2, readable-stream@^2.3.3, readable-stream@^2.3.6, readable-stream@~2.3.3, readable-stream@~2.3.6:
   version "2.3.6"
   resolved "http://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz#b11c27d88b8ff1fbe070643cf94b0c79ae1b0aaf"
@@ -3686,13 +3678,6 @@ sass@^1.14.3:
 sax@^1.2.4, sax@~1.2.1, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
-
-scribbletune@^1.9.2:
-  version "1.9.2"
-  resolved "https://registry.yarnpkg.com/scribbletune/-/scribbletune-1.9.2.tgz#6cbbd9604579736dee8685f658c6bcc2faa29140"
-  dependencies:
-    jsmidgen "~0.1.4"
-    tonal "^2.0.0"
 
 semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.6.0:
   version "5.6.0"
@@ -4112,84 +4097,6 @@ toml@^2.3.3:
 tomlify-j0.4@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/tomlify-j0.4/-/tomlify-j0.4-3.0.0.tgz#99414d45268c3a3b8bf38be82145b7bba34b7473"
-
-tonal-array@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-array/-/tonal-array-2.1.0.tgz#9e335f877b33106311133ae85fc4989b67e96cc6"
-  dependencies:
-    tonal-note "^2.1.0"
-
-tonal-chord@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-chord/-/tonal-chord-2.1.0.tgz#5e2b03db854610c70b132d8813dd47bd9dc6d0b1"
-  dependencies:
-    tonal-dictionary "^2.1.0"
-    tonal-distance "^2.1.0"
-    tonal-note "^2.1.0"
-    tonal-pcset "^2.1.0"
-
-tonal-dictionary@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-dictionary/-/tonal-dictionary-2.1.0.tgz#b97d4b0371a779177fdcf090829cb4a784ec9d89"
-  dependencies:
-    tonal-array "^2.1.0"
-    tonal-note "^2.1.0"
-    tonal-pcset "^2.1.0"
-
-tonal-distance@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-distance/-/tonal-distance-2.1.0.tgz#c122478b7f52d8737b04edb8a909e282c1f13c74"
-  dependencies:
-    tonal-interval "^2.1.0"
-    tonal-note "^2.1.0"
-
-tonal-interval@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-interval/-/tonal-interval-2.1.0.tgz#cc760b7eb2f66083bd330d36e98c86ae37a4063f"
-
-tonal-key@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/tonal-key/-/tonal-key-2.1.1.tgz#059bca0a3132a19c40b90cd85e8e5f4abc158158"
-  dependencies:
-    tonal-array "^2.1.0"
-    tonal-distance "^2.1.0"
-    tonal-note "^2.1.0"
-
-tonal-note@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-note/-/tonal-note-2.1.0.tgz#d63dec77bd9bedfd783a22bd50b2d4f8210292fb"
-
-tonal-pcset@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-pcset/-/tonal-pcset-2.1.0.tgz#f54aa34630b3512dbefc0522fcca1ba1ee8b3220"
-  dependencies:
-    tonal-array "^2.1.0"
-    tonal-interval "^2.1.0"
-    tonal-note "^2.1.0"
-
-tonal-scale@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tonal-scale/-/tonal-scale-2.1.0.tgz#281b1a9abd30ec7ef17aae9d628cd0917542a1d6"
-  dependencies:
-    tonal-array "^2.1.0"
-    tonal-dictionary "^2.1.0"
-    tonal-distance "^2.1.0"
-    tonal-note "^2.1.0"
-    tonal-pcset "^2.1.0"
-
-tonal@^2.0.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/tonal/-/tonal-2.1.1.tgz#ea49cf0e8d8f1114106d4bad8f38c2ba5164447e"
-  dependencies:
-    tonal-array "^2.1.0"
-    tonal-chord "^2.1.0"
-    tonal-dictionary "^2.1.0"
-    tonal-distance "^2.1.0"
-    tonal-interval "^2.1.0"
-    tonal-key "^2.1.1"
-    tonal-note "^2.1.0"
-    tonal-pcset "^2.1.0"
-    tonal-scale "^2.1.0"
 
 tone@^0.12.80:
   version "0.12.80"

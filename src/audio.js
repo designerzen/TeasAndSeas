@@ -1,13 +1,8 @@
-// import {chord } from "./external/scribbletune/src/chord"
-// import { clip } from "./external/scribbletune/src/clip"
-// import { session } from "./external/scribbletune/src/session"
-// import { scale } from "./external/scribbletune/src/scale"
-// import { scales} from "./external/scribbletune/src/scales"
-// import { midi } from "./external/scribbletune/src/midi"
-// import { mode } from "./external/scribbletune/src/mode"
+import { shuffleArray } from "./utils";
 import { chord, clip, session, scale, scales, midi, mode } from "./external/scribbletune/src"
 import snareFile from "./assets/snare.wav"
 import kickFile from "./assets/kick.wav"
+
 // PolySynth
 // PluckSynth
 // NoiseSynth *
@@ -37,6 +32,7 @@ const piano = {
     'B4': 'https://scribbletune.com/sounds/piano/piano59.wav',
     'C4': 'https://scribbletune.com/sounds/piano/piano60.wav'
 };
+
 // sessions...
 const channels = session()
 
@@ -136,14 +132,19 @@ export const fetchScales = (note = "c4") =>{
 
 // Give it a scale full of notes... return some chords in
 // that scale!
-export const convertScaleToChord = (scale, filler='')=>{
-    // CM-5
+export const convertScaleToChord = (scale, filler=undefined, random=false)=>{
+   
+    filler = filler || ''
     //const collection = chord()
-    // drop first one as it is *always* going to be the C4
+    // CM-5
+    
     // Then make chords of the others using the filler...
     // Split after letters
-    let output = ''
+    //let output = ''
     const key = /[0-9]/
+    const output = []
+
+    // drop first one as it is *always* going to be the C4?
     // loop through scales from index 1
     for (let i = 1, q = scale.length; i <q; ++i)
     {
@@ -152,7 +153,7 @@ export const convertScaleToChord = (scale, filler='')=>{
        
         if (isSharp)
         {
-            output += note
+            output.push(note)
 
         }else{
 
@@ -164,55 +165,157 @@ export const convertScaleToChord = (scale, filler='')=>{
             const wordPart = note.substring(0,numericalIndex)
             const numberPart = note.substring(numericalIndex)
 
-            console.log({
-              parts,
-              wordPart,
-              numberPart,numericalIndex
-            });
+            // console.log({
+            //   parts,
+            //   wordPart,
+            //   numberPart,numericalIndex
+            // });
 
-            output += wordPart + filler + numberPart
-
-        }
-
-        if (i < q-1)
-        {
-           // const numberPart = 
-            output += " "
+            output.push( wordPart + filler + numberPart )
         }
     }
-    return output
-    //return scale.slice(1,-1).join(" ")
+
+    // if randomise...
+    if (random)
+    {
+        shuffleArray(output)
+    }
+
+    return output.join(" ")
 }
 
-export const saveMidi = (text) =>{
-    
-    const clip = clip({
-        notes: scale('c4 major'),
-        pattern: 'x'.repeat(8)
+///////////////////////////////////////////////////////////////////////////
+// Save MIDI!
+///////////////////////////////////////////////////////////////////////////
+export const saveMidi = (notes="c4",pattern="x") =>{
+    const data = clip({
+        notes,
+        pattern
     })
-
-    midi(clip)
+    const bytes = midi(data, null)
+    // Encode byte string from Scribbletune as base64
+    const b64 = btoa(midi(data, bytes))
+    return b64
 }
 
-export const createClip = (sentiment, instrument ="Synth") =>{
+///////////////////////////////////////////////////////////////////////////
+//
+// Word from pattern
+// As there are potentially sixteen beats in a bar (ignoring semi stuff)
+// we can use the length of the word to determine the pattern of play
+///////////////////////////////////////////////////////////////////////////
+export const determinePatternFromWord = (word,score=0) =>{
 
-    
-    return clip({
-      synth: instrument,
-      pattern: "-x",
-      notes: "C4 D4 C4 D#4 C4 D4 C4 Bb3"
-      //   notes: scale("c4 major"),
-      //   pattern: "x".repeat(8)
+    const {length} = word
+    const letters = word.split('')
+
+    /*
+    // if it is too long make it go like a machine gun!
+    if (length>16)
+    {
+        return "x-x-".repeat(4)
+    } 
+
+    // short like : the of an I we as am and are get etc
+    if (length < 4)
+    {
+        return "x___x__-".repeat(2)
+        // return "x___-".repeat(4)
+    }*/
+   
+    // loop through the letters of the word to determine the pattern
+    let isNotePlaying = false
+    const pattern = letters.map( (letter, index)=>{
+
+        const position = index%16
+        letter = letter.toLowerCase()
+
+        // is this letter a vowel?
+        // vowels we use as bridges and sustain the note
+        // they are the glue that binds words together
+        const isVowel = (letter === 'a' || letter === 'e' || letter === 'o' || letter === 'u')
+        
+        /*
+        // always start the sixteen on a downbeat
+        // (this just makes the following easier)
+        if (index === 0)
+        {
+            isNotePlaying = true
+            return "x"
+        }
+*/
+        // return a sustain of the previous note
+        if (isNotePlaying && isVowel)
+        {
+          return "_";
+        }
+
+        // hit it if it's a constonant
+        // if it is in a sad pattern
+        if (score > 0) 
+        {
+
+            // HAPPY WORD!
+            // convert vowels into gaps!
+            //console.log("word sentiment is happy!", score)
+            isNotePlaying = true
+            return "x"
+        } 
+        // else if (score < 0) {
+          
+        //     // BAD WORD
+        //     //console.log("word sentiment is sour!", score)
+        //     //return 'x-'.repeat(word.length)
+        //     return "x"
+        // }
+
+        // NEUTRAL - whitespace
+        // get as much of this as you can!
+        //console.log("word sentiment is neutral", score)
+        //return "x---x---x---x---"
+        // else stop it!
+        isNotePlaying = false
+        return "-"
     })
+    return pattern.join('')
 }
+
+///////////////////////////////////////////////////////////////////////////
+//
+// feed this a sentiment and it will give you a chord from the current
+// scale that in some way represents that emotion  
+//
+///////////////////////////////////////////////////////////////////////////
+export  const determineNotesFromSentiment = (score, scale) => {
+
+    if (score > 0) 
+    {
+        // HAPPY WORD!
+        //console.log("word sentiment is happy!", score)
+        return convertScaleToChord(scale, "M-")
+
+    } else if (score === 0) {
+
+        // NEUTRAL
+        //console.log("word sentiment is neutral", score)
+        return convertScaleToChord(scale)
+
+    } else {
+
+        // BAD WORD
+        //console.log("word sentiment is sour!", score)
+        return convertScaleToChord(scale, "m-")
+    }
+}
+
+
 
 export const startAudio = (row = 1, bpm = 90, volume=1, callback, signature="8n" ) =>{
 
     channels.startRow(row)
 
-    Tone.Transport.bpm.value = bpm
-    Tone.Master.volume.value = volume
-    Tone.Transport.start()
+    setBPM(bpm)
+    setVolume(volume)
 
     Tone.Transport.scheduleRepeat( (time)=> {
 
@@ -220,6 +323,21 @@ export const startAudio = (row = 1, bpm = 90, volume=1, callback, signature="8n"
         callback(time)
 
     }, signature)
+
+    // immediately call the callback...
+    callback(0)
+
+    Tone.Transport.start()
+    setVolume(volume)
+}
+
+export const setVolume = (volume) =>{
+    Tone.Master.volume.value = volume
+    console.log("Setting volume to", volume, "dB ->", Tone.Master.volume.value)
+}
+
+export const setBPM = (bpm) =>{
+    Tone.Transport.bpm.value = bpm
 }
 
 export const changeRow = (row=1) =>{

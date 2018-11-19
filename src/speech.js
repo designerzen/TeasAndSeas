@@ -22,7 +22,7 @@ const getSpecificVoice = (lang = "en-US", name ="Zira") =>{
 // rate     0.1 to 10
 // pitch    0 to 2
 ////////////////////////////////////////////////////////////
-export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zira") =>{
+export const say = (text, interupt=true, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zira") =>{
 
   return new Promise( (resolve,reject)=>{
 
@@ -59,6 +59,10 @@ export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zir
             resolve(event)
           }
 
+          speech.onerror = (event) =>{
+            reject()
+          }
+
           // 0 to 1
           speech.volume = volume
           // 0.1 to 10
@@ -75,6 +79,11 @@ export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zir
             // });
 
 
+          // kill any pending!
+          if (interupt)
+          {
+            window.speechSynthesis.cancel()
+          }
           window.speechSynthesis.speak(speech)
 
         }
@@ -85,4 +94,16 @@ export const say = (text, volume=1, rate=9, pitch=1, lang = "en-US", name = "Zir
       setTimeout(talk,0)
     }
   })
+}
+
+
+export const stopSpeaking = ()=>{
+
+  return window.speechSynthesis.cancel()
+}
+
+
+export const isVoiceActive = ()=>{
+
+  return window.speechSynthesis.pending
 }
