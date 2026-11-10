@@ -5,14 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeasAndSeas</title>
+    <meta name="description" content="Legal documents converted into music videos, so that you can hear what you are signing.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Ctext x='16' y='23' font-family='sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='%23fff'%3E%C2%A7%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300..900&display=swap">
     <link rel="stylesheet" href="./style.scss" />
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.3.1/Tone.min.js"></script> -->
 </head>
 
 <body>
 
     <main>
-       
+
         <section id="start">
 
             <header>
@@ -20,53 +24,126 @@
                 <h2>Musical Contract Sentiment Describer</h2>
             </header>
 
-            <p>
-                Conversion of legal documents into music videos using procedural synthesis of emotion based on sentiment analysis 
-                Source code available at github
+            <p class="intro">
+                Nobody reads the small print, so listen to it instead.
+                Legal documents are read aloud over music that follows what the words do to you :
+                bright when a term is on your side, uneasy when it is not, and doom when it is exploitative.
+                <a href="https://github.com/designerzen/TeasAndSeas">Source code available at github</a>
             </p>
 
             <nav id="selection">
                 <h3>Select a contract</h3>
                 <ul id="presets">
-                    <li><a class="preset" href="./presets/tc-stripped.txt">RED Hackathon T &amp; C's</a></li>
-                    <li><a class="preset" href="./presets/brexit.txt">Brexit</a></li>
+                    <!-- Transcluded from presets/index.js -->
                 </ul>
-            
-                <form action="/" class="uploader">
-                    <label class="vi" for="uploader">Upload your own</label>
-                    <input type="file" id="uploader" placeholder="Upload a legal contract">
+
+                <form action="/" class="uploader" id="dropzone">
+                    <label for="uploader">Or upload your own</label>
+                    <input type="file" id="uploader" placeholder="Choose or drop a text file, PDF or Word document">
                 </form>
+
+                <details id="paste">
+                    <summary>Or paste the words</summary>
+                    <label class="vi" for="pasted">Contract text</label>
+                    <textarea id="pasted" rows="8" placeholder="Paste the terms here"></textarea>
+                    <button id="paste-go" type="button">Read this out</button>
+                </details>
+
+                <details id="opinion">
+                    <summary>Get a second opinion from Claude</summary>
+                    <p>
+                        Contracts are scored in your browser by spotting known kinds of clause.
+                        Add an Anthropic API key and Claude will read the contract properly and score it instead.
+                        The key is kept for this tab only and the contract is sent to Anthropic and nobody else.
+                    </p>
+                    <label class="vi" for="api-key">Anthropic API key</label>
+                    <input type="password" id="api-key" placeholder="sk-ant-…" autocomplete="off" spellcheck="false">
+                </details>
             </nav>
 
         </section>
 
 
-        <section id="words" class="hide">
+        <section id="words" hidden>
 
-            <button id="go">Describe in the medium of a pop video</button>
-            <button id="download">Download as MIDI</button>
-                    
-            <div id="ticker">
-                <!-- Transcluded -->
+            <header id="hud">
+                <h3 id="title"></h3>
+                <p id="summary"></p>
+            </header>
+
+            <button id="go" type="button">Describe in the medium of a pop video</button>
+
+            <div id="karaoke">
+                <p id="before" aria-hidden="true"></p>
+                <p id="ticker">
+                    <!-- Transcluded -->
+                </p>
+                <p id="after" aria-hidden="true"></p>
             </div>
 
             <p id="data"></p>
-            
-            <em id="warning">Warning:May induce seizure or mild distaste</em>
-            
+
+            <canvas id="strip" height="56" role="slider" tabindex="0" aria-label="Position in contract" aria-valuemin="0"></canvas>
+
+            <div id="controls" hidden>
+                <button id="previous" type="button" title="Previous phrase (left arrow)">Back</button>
+                <button id="pause" type="button" title="Pause (space)">Pause</button>
+                <button id="next" type="button" title="Next phrase (right arrow)">Skip</button>
+
+                <label>Music <input type="range" id="volume" min="0" max="1" step="0.01" value="0.7"></label>
+                <label>Pace <input type="range" id="rate" min="0.6" max="1.8" step="0.05" value="1"></label>
+                <label class="check"><input type="checkbox" id="narration" checked> Voice</label>
+                <label class="vi" for="voice">Narrator</label>
+                <select id="voice"></select>
+
+                <button id="download" type="button">Download as MIDI</button>
+                <button id="quit" type="button" title="Choose another contract (escape)">Another contract</button>
+            </div>
+
+            <em id="warning">Warning: May induce seizure or mild distaste</em>
+
         </section>
 
 
-        <section id="feedback">
-            <div id="busy">
+        <section id="verdict" hidden>
+            <h3>The verdict</h3>
+            <p id="verdict-label"></p>
+            <p id="verdict-summary"></p>
+            <div id="verdict-meter" aria-hidden="true">
+                <span>Against you</span>
+                <i id="verdict-needle"></i>
+                <span>For you</span>
+            </div>
+            <p id="verdict-stats"></p>
+
+            <div id="verdict-worst-section">
+                <h4>The worst of it</h4>
+                <ol id="verdict-worst"></ol>
+            </div>
+            <div id="verdict-best-section">
+                <h4>In your favour</h4>
+                <ol id="verdict-best"></ol>
+            </div>
+
+            <div class="actions">
+                <button id="again" type="button">Play it again</button>
+                <button id="verdict-download" type="button">Download as MIDI</button>
+                <button id="another" type="button">Another contract</button>
+            </div>
+            <p class="disclaimer">This is a musical instrument, not a lawyer. Nothing here is legal advice.</p>
+        </section>
+
+
+        <section id="feedback" hidden>
+            <div id="busy" role="status">
 
             </div>
-            <progress id="progress" min="0" max="100" value=""></progress>
+            <progress id="progress" max="100" value="0"></progress>
         </section>
 
     </main>
 
-    <script src="./index.js"></script>
+    <script type="module" src="./index.js"></script>
 </body>
 
 </html>

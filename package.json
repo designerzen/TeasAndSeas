@@ -1,30 +1,42 @@
 {
-  "name": "TeasAndSeas",
-  "version": "0.0.5",
+  "name": "teas-and-seas",
+  "version": "0.1.0",
   "description": "Legal document to music video convertor",
-  "main": "index.js",
+  "type": "module",
   "repository": "https://github.com/designerzen/TeasAndSeas.git",
   "author": "designerzen <designerzen@gmail.com>",
-  "license": "Apache",
+  "license": "Apache-2.0",
   "private": false,
-  "devDependencies": {
-    "parcel-bundler": "^1.10.3",
-    "sass": "^1.14.3"
-  },
-  "dependencies": {
-    "sentiment": "^5.0.1",
-    "tone": "^0.12.80"
-  },
   "scripts": {
-    "start": "parcel ./src/index.html",
-    "build": "parcel build ./src/index.html",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
     "deploy": "gh-pages-deploy"
   },
   "gh-pages-deploy": {
     "staticpath": "dist",
-    "prep": [],
+    "prep": [
+      "build"
+    ],
     "commit": "deploy to github",
     "post": [],
     "noprompt": false
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.7.0",
+    "@diffusionstudio/vits-web": "^1.0.3",
+    "kokoro-js": "^1.2.1",
+    "mammoth": "^1.13.0",
+    "mespeak": "^2.0.2",
+    "pdfjs-dist": "^6.5.438",
+    "sam-js": "^0.3.1",
+    "sentiment": "^5.0.2",
+    "tone": "^15.1.22"
+  },
+  "devDependencies": {
+    "sass": "^1.108.1",
+    "vite": "^8.3.7",
+    "vitest": "^5.1.0"
   }
 }
