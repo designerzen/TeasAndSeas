@@ -13,7 +13,7 @@ export const elements = {
     verdict: find("verdict"),
     controls: find("controls"),
     title: find("title"),
-    summary: find("summary"),
+    duration: find("duration"),
     // gadgets
     busy: find("busy"),
     progress: find("progress"),

@@ -68,37 +68,38 @@
 
             <header id="hud">
                 <h3 id="title"></h3>
-                <p id="summary"></p>
             </header>
-
-            <button id="go" type="button">Describe in the medium of a pop video</button>
 
             <div id="karaoke">
                 <p id="before" aria-hidden="true"></p>
                 <p id="ticker">
                     <!-- Transcluded -->
                 </p>
+                <button id="go" type="button">Start <small id="duration"></small></button>
                 <p id="after" aria-hidden="true"></p>
             </div>
 
             <p id="data"></p>
 
-            <canvas id="strip" height="56" role="slider" tabindex="0" aria-label="Position in contract" aria-valuemin="0"></canvas>
+            <details id="controls" hidden>
+                <summary aria-label="Menu" title="Menu">&#9776;</summary>
+                <div class="panel">
+                    <canvas id="strip" height="56" role="slider" tabindex="0" aria-label="Position in contract" aria-valuemin="0"></canvas>
 
-            <div id="controls" hidden>
-                <button id="previous" type="button" title="Previous phrase (left arrow)">Back</button>
-                <button id="pause" type="button" title="Pause (space)">Pause</button>
-                <button id="next" type="button" title="Next phrase (right arrow)">Skip</button>
+                    <button id="previous" type="button" title="Previous phrase (left arrow)">Back</button>
+                    <button id="pause" type="button" title="Pause (space)">Pause</button>
+                    <button id="next" type="button" title="Next phrase (right arrow)">Skip</button>
 
-                <label>Music <input type="range" id="volume" min="0" max="1" step="0.01" value="0.7"></label>
-                <label>Pace <input type="range" id="rate" min="0.6" max="1.8" step="0.05" value="1"></label>
-                <label class="check"><input type="checkbox" id="narration" checked> Voice</label>
-                <label class="vi" for="voice">Narrator</label>
-                <select id="voice"></select>
+                    <label>Music <input type="range" id="volume" min="0" max="1" step="0.01" value="0.7"></label>
+                    <label>Pace <input type="range" id="rate" min="0.6" max="1.8" step="0.05" value="1"></label>
+                    <label class="check"><input type="checkbox" id="narration" checked> Voice</label>
+                    <label class="vi" for="voice">Narrator</label>
+                    <select id="voice"></select>
 
-                <button id="download" type="button">Download as MIDI</button>
-                <button id="quit" type="button" title="Choose another contract (escape)">Another contract</button>
-            </div>
+                    <button id="download" type="button">Download as MIDI</button>
+                    <button id="quit" type="button" title="Choose another contract (escape)">Another contract</button>
+                </div>
+            </details>
 
             <em id="warning">Warning: May induce seizure or mild distaste</em>
 

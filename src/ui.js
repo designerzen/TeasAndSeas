@@ -62,7 +62,7 @@ const describeLength = phrases => {
     const seconds = phrases.reduce((sum, phrase) =>
         sum + phrase.words.reduce((total, word) => total + estimateWordSeconds(word.text, rate), 0) + 0.2, 0)
     const minutes = Math.round(seconds / 60)
-    return minutes < 1 ? 'under a minute' : minutes < 90 ? `about ${minutes} minute${minutes === 1 ? '' : 's'}` : `about ${Math.round(minutes / 60)} hours`
+    return minutes < 1 ? '<1 min' : minutes < 90 ? `~${minutes} min` : `~${Math.round(minutes / 60)} hr`
 }
 
 // Creates a MIDI file in memory then downloads it
@@ -79,15 +79,17 @@ const present = () => {
     showElement(elements.words)
     showElement(elements.goButton)
     elements.words.classList.remove('playing', 'finished')
+    elements.words.classList.add('ready')
 
-    const { phrases, sentences, overall } = analysis
-    const reader = phrases.some(phrase => phrase.source === 'claude') ? 'Read by Claude' : 'Read by the built in rules'
+    const { phrases } = analysis
     elements.title.textContent = name
-    elements.summary.textContent = `${overall.words} words in ${sentences} sentence${sentences === 1 ? "" : "s"}, ${describeLength(phrases)} long. ${reader}.`
+    elements.controls.open = false
+    elements.duration.textContent = describeLength(phrases)
     elements.before.textContent = ''
     elements.after.textContent = ''
     elements.data.textContent = ''
-    elements.ticker.textContent = 'Ready when you are'
+    // the title takes the stage until the words arrive
+    elements.ticker.textContent = name
     elements.ticker.className = ''
     drawStrip(phrases)
     elements.goButton.focus()
@@ -326,16 +328,11 @@ const run = async (from = 0) => {
     interrupt()
     hideElement(elements.goButton)
     hideElement(elements.verdict)
+    elements.words.classList.remove('ready')
     setStatus('Tuning up')
 
     try {
-        await startAudio({
-            onBeat: pulse,
-            // for the musically curious
-            onBar: ({ mode, bpm }) => {
-                elements.summary.textContent = `D ${mode} at ${bpm} beats per minute`
-            }
-        })
+        await startAudio({ onBeat: pulse })
     } catch (error) {
         return fail(error)
     }
@@ -573,7 +570,10 @@ export const init = () => {
             seek(position)
         }
     })
-    window.addEventListener('resize', () => analysis && !elements.words.hidden && drawStrip(analysis.phrases, isPlaying ? position : -1))
+    const redrawStrip = () => analysis && !elements.words.hidden && drawStrip(analysis.phrases, isPlaying ? position : -1)
+    window.addEventListener('resize', redrawStrip)
+    // the map has no size until the menu it lives in is opened
+    elements.controls.addEventListener('toggle', redrawStrip)
 
     /////////////////////////////////////////////////////////////////////////////////////
     // EVENT : Download button
@@ -655,7 +655,7 @@ export const init = () => {
     window.addEventListener('keydown', event => {
         // leave typing and focused controls alone
         const { tagName } = event.target
-        if (!isPlaying || /^(INPUT|TEXTAREA|SELECT)$/.test(tagName) || (tagName === 'BUTTON' && event.key === ' ')) {
+        if (!isPlaying || /^(INPUT|TEXTAREA|SELECT)$/.test(tagName) || (/^(BUTTON|SUMMARY)$/.test(tagName) && event.key === ' ')) {
             return
         }
         switch (event.key) {

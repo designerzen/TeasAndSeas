@@ -279,28 +279,35 @@ input[type=file]{
   align-items: center;
   gap:$padding;
 
-  #hud{
-    text-align: center;
-    transition: opacity $mood;
+  // only the words being read out belong on the stage
+  #hud,
+  #before,
+  #after,
+  #data{
+    display: none;
   }
 
-  #summary{
-    opacity:0.7;
-    margin:$padding*0.5 0 0 0;
+  // before the music starts there is only the title and the way in
+  &.ready #ticker{
+    font-weight: 800;
+    text-transform: uppercase;
   }
 
-  // once the music starts everything but the words steps back
-  &.playing #hud{
-    opacity:0.5;
+  // once the music starts everything but the words leaves
+  &.playing #warning{
+    display: none;
   }
 
   // and when it stops the words make way for the verdict
   &.finished{
     flex:0;
 
+    #hud{
+      display: block;
+      text-align: center;
+    }
+
     #karaoke,
-    #data,
-    #summary,
     #warning{
       display: none;
     }
@@ -467,17 +474,79 @@ input[type=file]{
 }
 
 #go{
-  font-size: 1.2rem;
-  padding:$padding*1.5 $padding*3;
+  align-self: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding:$padding*1.5 $padding*4;
+  color:var(--background);
+  background:var(--ink);
+
+  &:focus-visible,
+  &:hover{
+    color:var(--ink);
+    background:transparent;
+  }
+
+  small{
+    font-size: 0.7em;
+    font-weight: 400;
+    opacity:0.7;
+    margin-left:$padding*0.5;
+  }
 }
 
+// everything you can fiddle with waits behind the menu
 #controls{
+  position: fixed;
+  top:$padding;
+  right:$padding;
+  z-index: 5;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
   gap:$padding;
-  width:100%;
+
+  &[hidden]{
+    display: none;
+  }
+
+  summary{
+    list-style: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    padding:$padding;
+    border-radius:$border-radius;
+    opacity:0.35;
+    transition: opacity $quick ease-out;
+
+    &::-webkit-details-marker{
+      display: none;
+    }
+
+    &:focus-visible,
+    &:hover{
+      opacity:1;
+    }
+  }
+
+  &[open] summary{
+    opacity:1;
+  }
+
+  .panel{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap:$padding;
+    padding:$padding;
+    width:min(22rem, calc(100vw - #{$padding*2}));
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+    background:rgba(0,0,0,0.85);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:$border-radius;
+  }
 
   label{
     display: inline-flex;
