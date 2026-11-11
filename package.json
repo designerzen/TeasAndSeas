@@ -11,17 +11,7 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
-    "deploy": "gh-pages-deploy"
-  },
-  "gh-pages-deploy": {
-    "staticpath": "dist",
-    "prep": [
-      "build"
-    ],
-    "commit": "deploy to github",
-    "post": [],
-    "noprompt": false
+    "test": "vitest run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.7.0",

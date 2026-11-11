@@ -22,6 +22,8 @@ Licensed under the Apache License, Version 2.0.
 
 ```npm run build``` builds the site into `dist`
 
+Pushing to `master` tests, builds and publishes the site to GitHub Pages (`.github/workflows/deploy.yml`)
+
 
 ## How it works
 
