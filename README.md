@@ -51,13 +51,26 @@ Optionally, paste an Anthropic API key into "Get a second opinion from Claude" a
 
 | Contract | Music |
 |---|---|
-| Valence | Mode, from darkest to brightest: Locrian, Phrygian, Aeolian, Dorian, Mixolydian, Ionian, Lydian. The home note never moves so the change is heard as light, not key |
+| Valence | Mode, from darkest to brightest: Locrian, Phrygian, Aeolian, Dorian, Mixolydian, Ionian, Lydian |
 | Severity | Tempo, drum pattern, distortion, reverb and a closing filter |
+| Emotion | Valence and severity together make one of seven emotions, each with its own key, chord colour, chord sequence, arpeggio and instrument sound (see below) |
 | Doom | 60 bpm half-time drums, a sub drone, a cluster chord and a tolling bell |
-| "Provided that..." | A surprise chord |
+| "Provided that..." | A chord borrowed from the minor, the flattened sixth, with a suspension that sinks onto its third |
 | Who benefits | *You* are a high bell-like voice, *they* are low brass. Whoever is winning carries the tune |
 | The words | The melody: syllables set the rhythm, good words climb and bad words fall |
-| The verdict | The ending: a full cadence, a suspended chord left hanging, or a tritone and three tolls of the bell |
+| The verdict | The ending: back home to D for a full cadence with a suspension on the five, a suspended chord left hanging, or a tritone and three tolls of the bell |
+
+| Emotion | Key | Chords | Arpeggio | Sound |
+|---|---|---|---|---|
+| Celebrating | Up a tone, the lift at the end of a pop song | Ninths, I V vi IV | Sixteenths up and down | Wide strings, bright pluck |
+| Happy | Home | Added ninths, I vi IV V | Climbing eighths | Warm pad, nylon pluck |
+| Calm | Stays where it is | Sevenths, plagal | One falling note a beat | Breathy air, glass |
+| Uncertain | The dominant | Suspended, never touching the key note | The top note off the beat | Reedy organ |
+| Sad | The relative minor | Minor sevenths, i VI III VII | A falling sigh | Slow strings |
+| Frustrated | Down a major third | Flattened fifths over a pedal bass | Two notes nagging in sixteenths | Buzzing square, clav |
+| Doom | A tritone from home | Clusters over a drone | None, the bell instead | A vast detuned choir |
+
+The key only changes when the feeling changes between bright and troubled, or lifts into celebration. Calm passes on whatever key it finds, so shades of the same feeling do not keep shifting the ground. A new key starts on its own key note. Chords are voiced around a centre note so that each moves to the next by step rather than in parallel, and the bass walks into the next chord from a semitone below when things are bright. The key, chord and timbre rules are adapted from the generative music notes of [Inclusive City](https://github.com/designerzen/inclusive-city). They are choices made for this song, not universal rules about how keys feel. Instrument sounds are in `src/timbres.js`, and the MIDI file changes instrument with them.
 
 `src/audio.js` plays it live with [Tone.js](https://tonejs.github.io/), a beat at a time so that the music can turn as soon as the words do. `src/midi.js` writes the same notes to a MIDI file.
 

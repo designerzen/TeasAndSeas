@@ -6,13 +6,12 @@
 //  sung   : one sound per word, each on the note of the melody and each
 //           exactly as long as its note, so that the words land on the beat
 //  spoken : one sound for the whole phrase, with every word nudged up or
-//           down to the nearest note of the home chord so that it speaks in key
+//           down to the nearest note of the key chord so that it speaks in key
 
-import { composeMelody, modeFor, tempoFor, degreeToMidi } from './composer'
+import { composeMelody, modeFor, tempoFor, degreeToMidi, tonicFor } from './composer'
 import { estimateWordSeconds } from './text'
 import { detectPitch, findSound, midiToHz, foldIntoRange, snapToScale, tuningRate } from './pitch'
 
-const ROOT = 50
 // no word is allowed to hog more than half a bar
 const LONGEST_NOTE = 8
 // leave a sliver of air between one word and the next
@@ -26,13 +25,14 @@ const hasBreath = text => /[.,;:!?]["”’)\]]*$/.test(text)
 // Each note of the melody gets the word, the length and the layers of sound
 export const arrangeSung = (voice, phrase, mood, pace = 1) => {
     const mode = modeFor(mood.valence)
+    const tonic = tonicFor(mood)
     const sixteenth = 15 / tempoFor(mood)
     const who = mood.beneficiary
     const [low, high] = voice.range(who)
 
     const melody = composeMelody(phrase).map((note, index) => {
         const word = phrase.words[index]
-        const midi = foldIntoRange(degreeToMidi(mode, note.degree, ROOT), low, high)
+        const midi = foldIntoRange(degreeToMidi(mode, note.degree, tonic), low, high)
         const hz = midiToHz(midi)
 
         // say it once to find out how long it takes...
@@ -62,7 +62,7 @@ export const arrangeSung = (voice, phrase, mood, pace = 1) => {
         const layers = [sing(midi, 1)]
         // the best words get a harmony above and the worst get a shadow below
         if (word.score > 1 && mood.valence > 0.15) {
-            layers.push(sing(foldIntoRange(degreeToMidi(mode, note.degree + 2, ROOT), low, high + 5), 0.5))
+            layers.push(sing(foldIntoRange(degreeToMidi(mode, note.degree + 2, tonic), low, high + 5), 0.5))
         } else if (word.trigger) {
             layers.push(sing(midi - 12 >= low - 7 ? midi - 12 : midi - 5, 0.7))
         }
@@ -159,9 +159,10 @@ export const studySpoken = (sound, phrase) => {
 }
 
 // A performance for a natural voice : how fast to play each word so that
-// it lands on a note of the home chord, and when each word will be heard
+// it lands on a note of the key chord, and when each word will be heard
 export const arrangeSpoken = (study, mood) => {
     const mode = modeFor(mood.valence)
+    const tonic = tonicFor(mood)
     // the first, third and fifth notes of the mode. the brighter the mood
     // the sweeter the chord, and at the bottom of the ladder it is diminished
     const chord = [mode.steps[0], mode.steps[2], mode.steps[4]]
@@ -171,7 +172,7 @@ export const arrangeSpoken = (study, mood) => {
     const segments = words.map(word => {
         // words with no pitch of their own borrow from the one before
         if (word.hz) {
-            rate = tuningRate(word.hz, snapToScale(word.hz, ROOT, chord), BEND_LIMIT)
+            rate = tuningRate(word.hz, snapToScale(word.hz, tonic, chord), BEND_LIMIT)
         }
         const segment = { time, offset: word.start / sampleRate, rate }
         time += (word.end - word.start) / sampleRate / rate

@@ -9,19 +9,19 @@ import { countSyllables } from './text'
 
 export const SIXTEENTHS = 16
 
-// D is the home note for everything, so that a change of mode
-// is heard as a change of light rather than a change of key
+// D is home. The song wanders to other keys as the contract changes its
+// mind, and always comes back here for the final word
 const ROOT = 50
 
 // ordered from darkest to brightest. each step up raises one note
 export const MODES = [
-    { name: 'Locrian', steps: [0, 1, 3, 5, 6, 8, 10], progression: [0, 1, 0, 4] },
-    { name: 'Phrygian', steps: [0, 1, 3, 5, 7, 8, 10], progression: [0, 1, 0, 6] },
-    { name: 'Aeolian', steps: [0, 2, 3, 5, 7, 8, 10], progression: [0, 5, 3, 4] },
-    { name: 'Dorian', steps: [0, 2, 3, 5, 7, 9, 10], progression: [0, 3, 0, 6] },
-    { name: 'Mixolydian', steps: [0, 2, 4, 5, 7, 9, 10], progression: [0, 6, 3, 0] },
-    { name: 'Ionian', steps: [0, 2, 4, 5, 7, 9, 11], progression: [0, 4, 5, 3] },
-    { name: 'Lydian', steps: [0, 2, 4, 6, 7, 9, 11], progression: [0, 1, 0, 4] }
+    { name: 'Locrian', steps: [0, 1, 3, 5, 6, 8, 10] },
+    { name: 'Phrygian', steps: [0, 1, 3, 5, 7, 8, 10] },
+    { name: 'Aeolian', steps: [0, 2, 3, 5, 7, 8, 10] },
+    { name: 'Dorian', steps: [0, 2, 3, 5, 7, 9, 10] },
+    { name: 'Mixolydian', steps: [0, 2, 4, 5, 7, 9, 10] },
+    { name: 'Ionian', steps: [0, 2, 4, 5, 7, 9, 11] },
+    { name: 'Lydian', steps: [0, 2, 4, 6, 7, 9, 11] }
 ]
 
 const MODE_THRESHOLDS = [-0.7, -0.4, -0.15, 0.05, 0.25, 0.55]
@@ -47,6 +47,63 @@ export const feelFor = mood => {
     return mood.valence > 0.15 ? FEEL_BRIGHT : FEEL_CALM
 }
 
+// How the contract makes you feel, in finer shades than the groove.
+// Each emotion has its own key, chord colour and chord sequence:
+//  family      : the key only changes when the feeling moves to another family,
+//                so that shades of the same feeling do not keep shifting key
+//  key         : where it takes the song, in semitones from home.
+//                null stays in whatever key the song is already in
+//  colour      : the notes of each chord, as steps up the mode from its root
+//  add         : notes that do not belong to the mode, in semitones from the root
+//  progression : the chords, as steps up the mode from the key note
+// These are choices made for this song, not rules about how keys feel
+export const EMOTIONS = {
+    // up a tone, the lift at the end of a pop song. ninth chords
+    celebrating: { family: 'bright', key: 2, colour: [0, 2, 4, 6, 8], progression: [0, 4, 5, 3, 0, 4, 3, 4] },
+    // home, with an added ninth
+    happy: { family: 'bright', key: 0, colour: [0, 2, 4, 8], progression: [0, 5, 3, 4, 0, 5, 1, 4] },
+    // wherever we are, softened by sevenths
+    calm: { family: 'still', key: null, colour: [0, 2, 4, 6], progression: [0, 3, 5, 3, 0, 3, 1, 4] },
+    // the dominant, a question waiting for an answer. suspended chords that
+    // never touch the key note
+    uncertain: { family: 'troubled', key: -5, colour: [0, 3, 4, 6], progression: [3, 4, 3, 1, 3, 4, 5, 4] },
+    // the relative minor
+    sad: { family: 'troubled', key: -3, colour: [0, 2, 4, 6], progression: [0, 5, 2, 6, 0, 5, 3, 4] },
+    // further down and further out. every chord has a flattened fifth in it
+    frustrated: { family: 'troubled', key: -4, colour: [0, 2, 6], add: [6], progression: [0, 1, 0, 1, 5, 6, 4, 4] },
+    // a tritone from home, as far away as music goes, unless trouble has
+    // already taken us somewhere. clusters
+    doom: { family: 'troubled', key: -6, colour: [0], add: [1, 6], progression: [0, 0, 1, 0, 0, 0, 4, 1] }
+}
+
+export const emotionFor = mood => {
+    if (mood.doom) {
+        return 'doom'
+    }
+    if (mood.severity > 0.25) {
+        return mood.valence < -0.15 || mood.severity > 0.45 ? 'frustrated' : 'uncertain'
+    }
+    if (mood.valence > 0.55) {
+        return 'celebrating'
+    }
+    if (mood.valence > 0.15) {
+        return 'happy'
+    }
+    if (mood.valence < -0.4) {
+        return 'sad'
+    }
+    return mood.valence < -0.15 ? 'uncertain' : 'calm'
+}
+
+// keys are kept within a tritone of home so the register never runs away
+const normaliseKey = key => ((key + 6) % 12 + 12) % 12 - 6
+
+// the key note of the key the mood is in
+export const tonicFor = mood => ROOT + (mood.key || 0)
+
+const NOTE_NAMES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B']
+export const keyName = mood => NOTE_NAMES[tonicFor(mood) % 12]
+
 export const tempoFor = mood => {
     switch (feelFor(mood)) {
         // doom does not hurry
@@ -60,6 +117,65 @@ export const tempoFor = mood => {
 export const degreeToMidi = (mode, degree, base = ROOT) => {
     const octave = Math.floor(degree / 7)
     return base + octave * 12 + mode.steps[degree - octave * 7]
+}
+
+// move a note into the octave that starts at low
+const fold = (midi, low) => low + ((midi - low) % 12 + 12) % 12
+
+// Spread the chord around a centre note, each note in the octave nearest to
+// it. Successive chords then share notes and move by step instead of
+// jumping about in parallel, as a choir or a pianist would
+const voice = (tones, centre) => [...new Set(tones.map(midi => fold(midi, centre - 6)))].sort((a, b) => a - b)
+
+// the notes of the chord built on a step of the mode
+const chordTones = (mode, tonic, root, emotion) => {
+    const { colour, add = [] } = EMOTIONS[emotion]
+    const bottom = degreeToMidi(mode, root, tonic)
+    return [...colour.map(step => degreeToMidi(mode, root + step, tonic)), ...add.map(semitones => bottom + semitones)]
+}
+
+// the arpeggio : how each emotion breaks up its chord
+const arpeggiate = (emotion, tones, add) => {
+    const count = tones.length
+    const upAndDown = [...tones, ...tones.slice(1, -1).reverse()]
+    switch (emotion) {
+        case 'celebrating':
+            // a torrent of sixteenths up and down the chord
+            for (let i = 0; i < 16; ++i) {
+                add('arp', upAndDown[i % upAndDown.length], i, 1, i % 4 === 0 ? 0.36 : 0.24)
+            }
+            break
+        case 'happy':
+            // climbing eighths
+            for (let i = 0; i < 8; ++i) {
+                add('arp', tones[i % count], i * 2, 2, i % 2 ? 0.22 : 0.3)
+            }
+            break
+        case 'calm':
+            // a slow fall, one note a beat
+            for (let i = 0; i < 4; ++i) {
+                add('arp', tones[count - 1 - i % count], i * 4, 4, 0.2)
+            }
+            break
+        case 'uncertain':
+            // the top note again and again, off the beat, like a held breath
+            for (let i = 0; i < 4; ++i) {
+                add('arp', tones[count - 1], i * 4 + 2, 2, 0.18)
+            }
+            break
+        case 'sad':
+            // a sigh in the second half of the bar, falling and fading
+            for (let i = 0; i < 4; ++i) {
+                add('arp', tones[count - 1 - i % count], 8 + i * 2, 2, 0.24 - i * 0.03)
+            }
+            break
+        case 'frustrated':
+            // the bottom two notes, nagging in sixteenths
+            for (let i = 0; i < 16; ++i) {
+                add('arp', tones[i % 2], i, 1, i % 4 === 0 ? 0.3 : 0.18)
+            }
+            break
+    }
 }
 
 // a small deterministic random number so that the same contract
@@ -126,36 +242,68 @@ export const composeBar = ({ bar, phraseBar = 0, mood, melody = [], melodyCursor
         word === undefined ? { track, midi, at, length, velocity } : { track, midi, at, length, velocity, word }
     )
 
-    // HARMONY : a pivot ("provided that...") pulls the rug with a surprise chord
-    const chord = mood.pivot && phraseBar === 0 ? 5 : mode.progression[bar % 4]
+    // HARMONY : each emotion has its own chords and its own key. A song that
+    // has just changed key starts by planting its feet on the new key note
+    const emotion = mood.emotion || emotionFor(mood)
+    const tonic = tonicFor(mood)
+    const { progression } = EMOTIONS[emotion]
     const isDoom = feel === FEEL_DOOM
-    const padBase = isDoom ? ROOT - 12 : ROOT
-    // doom squashes the chord into a cluster. happiness adds a seventh on top
-    const shape = isDoom ? [0, 1, 4] : mood.valence > 0.25 ? [0, 2, 4, 6] : [0, 2, 4]
-    const padLevel = 0.3 + mood.severity * 0.3
-    shape.forEach(interval => add('pad', degreeToMidi(mode, chord + interval, padBase), 0, 16, padLevel))
+    const isPivot = mood.pivot && phraseBar === 0
+    const chord = isPivot ? 5
+        : mood.modulated && phraseBar === 0 && emotion !== 'uncertain' ? 0
+        : progression[bar % progression.length]
+    const nextChord = progression[(bar + 1) % progression.length]
+    // doom sits an octave down in the mud
+    const centre = isDoom ? ROOT - 3 : ROOT + 9
+    // the chords swell a little as a phrase goes on
+    const padLevel = Math.min(1, (0.3 + mood.severity * 0.3) * (1 + Math.min(phraseBar, 3) * 0.05))
+    let tones
+    if (isPivot) {
+        // "provided that..." pulls the rug with a chord borrowed from the minor :
+        // the flattened sixth, its fourth sinking onto the third halfway through
+        const third = voice([tonic + 12], centre)[0]
+        tones = voice([tonic + 8, tonic + 12, tonic + 15], centre)
+        tones.filter(midi => midi !== third).forEach(midi => add('pad', midi, 0, 16, padLevel))
+        add('pad', third + 1, 0, 8, padLevel)
+        add('pad', third, 8, 8, padLevel)
+    } else {
+        tones = voice(chordTones(mode, tonic, chord, emotion), centre)
+        tones.forEach(midi => add('pad', midi, 0, 16, padLevel))
+    }
 
-    // BASS
-    const bassRoot = degreeToMidi(mode, chord, ROOT - 24)
+    // ARPEGGIO : the same chord an octave up, broken into a pattern
+    arpeggiate(emotion, tones.map(midi => midi + 12), add)
+
+    // BASS : kept between D1 and C#2 whatever the key
+    const low = ROOT - 24
+    const bassTonic = fold(tonic, low)
+    const bassRoot = isPivot ? fold(tonic + 8, low) : fold(degreeToMidi(mode, chord, tonic), low)
+    const bassFifth = bassRoot + 7
     switch (feel) {
         case FEEL_DOOM:
-            // a drone that never leaves home
-            add('bass', ROOT - 24, 0, 16, 1)
+            // a drone that never leaves the key note
+            add('bass', bassTonic, 0, 16, 1)
             break
-        case FEEL_TENSE:
+        case FEEL_TENSE: {
+            // frustration sits on a pedal : the chords move but the bass will not let go
+            const pedal = emotion === 'frustrated' ? bassTonic : bassRoot
             for (let i = 0; i < 8; ++i) {
-                add('bass', bassRoot, i * 2, 2, i % 4 === 0 ? 0.9 : 0.6)
+                add('bass', pedal, i * 2, 2, i % 4 === 0 ? 0.9 : 0.6)
             }
             break
-        case FEEL_BRIGHT:
+        }
+        case FEEL_BRIGHT: {
+            // walks into the next chord from a semitone below
+            const nextRoot = fold(degreeToMidi(mode, nextChord, tonic), low)
             add('bass', bassRoot, 0, 3, 0.8)
-            add('bass', degreeToMidi(mode, chord + 4, ROOT - 24), 6, 2, 0.6)
+            add('bass', bassFifth, 6, 2, 0.6)
             add('bass', bassRoot, 8, 3, 0.8)
-            add('bass', degreeToMidi(mode, chord + 4, ROOT - 24), 14, 2, 0.6)
+            add('bass', nextRoot === bassRoot ? bassFifth : nextRoot - 1, 14, 2, 0.6)
             break
+        }
         default:
             add('bass', bassRoot, 0, 8, 0.6)
-            add('bass', bassRoot, 8, 8, 0.5)
+            add('bass', bar % 2 ? bassFifth : bassRoot, 8, 8, 0.5)
     }
 
     // DRUMS : with the odd ghost note to stop it sounding like a machine
@@ -182,7 +330,7 @@ export const composeBar = ({ bar, phraseBar = 0, mood, melody = [], melodyCursor
     //  them - low and brassy
     if (melody.length) {
         const track = mood.beneficiary === 'them' ? 'them' : 'you'
-        const base = track === 'them' ? ROOT : ROOT + 24
+        const base = track === 'them' ? tonic : tonic + 24
         const level = mood.beneficiary === 'neutral' ? 0.3 : 0.55 + mood.severity * 0.35
         // a short rest before the tune comes round again
         const loop = melody.reduce((sum, note) => sum + note.length, 0) + 4
@@ -200,7 +348,7 @@ export const composeBar = ({ bar, phraseBar = 0, mood, melody = [], melodyCursor
         } while (repeat && position < SIXTEENTHS)
     }
 
-    return { events, mode, feel, bpm: tempoFor(mood), chord }
+    return { events, mode, feel, emotion, key: mood.key || 0, bpm: tempoFor(mood), chord }
 }
 
 // The last word. A fair contract resolves, a bad one is left to rot
@@ -230,10 +378,20 @@ export const composeEnding = overall => {
         return { events, mode, bpm: 86, bars: 2 }
     }
 
-    // four, five, home. everybody happy
-    ;[[3, 0], [4, 8], [0, 16]].forEach(([chord, at]) => {
+    // four, five, home. everybody happy. the five holds its fourth for a
+    // moment before giving way, and home has a ninth on top
+    const centre = ROOT + 9
+    ;[[3, 0, [0, 2, 4, 6]], [4, 8, [0, 2, 4, 6]], [0, 16, [0, 2, 4, 8]]].forEach(([chord, at, colour]) => {
         const length = chord === 0 ? 16 : 8
-        ;[0, 2, 4].forEach(interval => add('pad', degreeToMidi(mode, chord + interval), at, length, 0.45))
+        const tones = voice(colour.map(step => degreeToMidi(mode, chord + step)), centre)
+        if (chord === 4) {
+            const third = voice([degreeToMidi(mode, chord + 2)], centre)[0]
+            tones.filter(midi => midi !== third).forEach(midi => add('pad', midi, at, length, 0.45))
+            add('pad', voice([degreeToMidi(mode, chord + 3)], centre)[0], at, 4, 0.45)
+            add('pad', third, at + 4, 4, 0.45)
+        } else {
+            tones.forEach(midi => add('pad', midi, at, length, 0.45))
+        }
         add('bass', degreeToMidi(mode, chord, ROOT - 24), at, length, 0.8)
         add('kick', 0, at, 1, 0.8)
     })
@@ -249,11 +407,23 @@ export const blendMood = (previous, phrase) => {
     const blend = (from, to) => from + (to - from) * mix
     const valence = previous ? blend(previous.valence, phrase.valence) : phrase.valence
     const severity = previous ? blend(previous.severity, phrase.severity) : phrase.severity
-    return {
+    const blended = {
         valence,
         severity,
         doom: phrase.doom,
         pivot: phrase.pivot,
         beneficiary: phrase.beneficiary
     }
+    // The key only moves when the feeling changes family, or for the lift
+    // into celebration. A song that has jumped here starts in the key of
+    // the feeling it lands in
+    const emotion = emotionFor(blended)
+    // keyFamily remembers which family chose the key, as calm passes it on
+    const { family, key: requested } = EMOTIONS[emotion]
+    const held = previous ? previous.key || 0 : 0
+    const heldFamily = previous && previous.keyFamily
+    const moves = requested !== null && (heldFamily !== family || (emotion === 'celebrating' && previous.emotion !== emotion))
+    const key = normaliseKey(moves ? requested : held)
+    const keyFamily = moves ? family : heldFamily
+    return { ...blended, emotion, key, keyFamily, modulated: !!previous && key !== held }
 }

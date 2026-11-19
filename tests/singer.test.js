@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { analyse } from '../src/analyser'
-import { blendMood, composeBar, tempoFor, modeFor } from '../src/composer'
+import { blendMood, composeBar, tempoFor, modeFor, tonicFor } from '../src/composer'
 import { detectPitch, findSound, midiToHz, hzToMidi, foldIntoRange, snapToScale, tuningRate } from '../src/pitch'
 import { arrangeSung, arrangeSpoken, studySpoken, locateWords } from '../src/singer'
 import { create as createSam } from '../src/voices/sam'
@@ -127,7 +127,7 @@ describe('singing', () => {
         const { melody } = arrangeSung(sam, phrase, mood)
         const { steps } = modeFor(mood.valence)
         melody.forEach(note => {
-            expect(steps).toContain(((note.midi - 50) % 12 + 12) % 12)
+            expect(steps).toContain(((note.midi - tonicFor(mood)) % 12 + 12) % 12)
             const [low, high] = sam.range(mood.beneficiary)
             expect(note.midi).toBeGreaterThanOrEqual(low)
             expect(note.midi).toBeLessThanOrEqual(high)

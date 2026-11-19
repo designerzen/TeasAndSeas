@@ -4,6 +4,7 @@
 
 import { composeBar, composeMelody, composeEnding, blendMood, SIXTEENTHS } from './composer'
 import { estimateWordSeconds } from './text'
+import { TIMBRES } from './timbres'
 
 const TICKS_PER_BEAT = 480
 const TICKS_PER_SIXTEENTH = TICKS_PER_BEAT / 4
@@ -11,6 +12,7 @@ const TICKS_PER_SIXTEENTH = TICKS_PER_BEAT / 4
 // general midi instruments and drum notes
 const TRACKS = {
     pad: { name: 'Mood', channel: 0, program: 89 },
+    arp: { name: 'Arpeggio', channel: 5, program: 98 },
     bass: { name: 'Bass', channel: 1, program: 38 },
     you: { name: 'You', channel: 2, program: 11 },
     them: { name: 'Them', channel: 3, program: 61 },
@@ -93,7 +95,15 @@ export const createMidi = analysis => {
 
     let tick = 0
     let bpm = 0
+    let emotion
     bars.forEach(bar => {
+        // the chords and arpeggio change instrument with the emotion, as they do live
+        if (bar.emotion && bar.emotion !== emotion) {
+            emotion = bar.emotion
+            Object.entries(TIMBRES[emotion].programs).forEach(([id, program]) => {
+                messages[id].push({ tick, priority: 0, data: [0xc0 | TRACKS[id].channel, program] })
+            })
+        }
         if (bar.bpm !== bpm) {
             bpm = bar.bpm
             const microseconds = Math.round(60000000 / bpm)

@@ -3,7 +3,8 @@
 // time, so that the music can change direction as soon as the contract does
 
 import * as Tone from 'tone'
-import { composeBar, composeEnding, SIXTEENTHS, FEEL_DOOM } from './composer'
+import { composeBar, composeEnding, keyName, SIXTEENTHS, FEEL_DOOM } from './composer'
+import { TIMBRES } from './timbres'
 import snareFile from './assets/snare.wav'
 import kickFile from './assets/kick.wav'
 
@@ -24,6 +25,8 @@ let beat = 0
 let composed
 let isNewPhrase = false
 let heldChord = []
+// which emotion the instruments are dressed for
+let dressed
 // whoever is at the microphone, and the sounds they are making right now
 let vocal = null
 let sounding = []
@@ -63,11 +66,10 @@ const build = () => {
     effects = { limiter, reverb, filter, grit, echo, voice, drive, demon }
 
     instruments = {
-        pad: new Tone.PolySynth(Tone.Synth, {
-            oscillator: { type: 'fatsawtooth', count: 3, spread: 18 },
-            envelope: { attack: 0.5, decay: 0.4, sustain: 0.7, release: 1.5 },
-            volume: -20
-        }).connect(grit),
+        // the chords and the arpeggio change their sound with the emotion (see timbres.js)
+        pad: new Tone.PolySynth(Tone.Synth, { ...TIMBRES.calm.pad, volume: -20 }).connect(grit),
+
+        arp: new Tone.PolySynth(Tone.Synth, { ...TIMBRES.calm.arp, volume: -22 }).connect(echo),
 
         bass: new Tone.MonoSynth({
             oscillator: { type: 'sawtooth' },
@@ -119,7 +121,8 @@ const play = (event, at, sixteenth, isHeld = true) => {
     const { drums } = instruments
     switch (event.track) {
         case 'pad':
-            if (isHeld) {
+            // a suspension that resolves mid bar is not held
+            if (isHeld && event.at === 0 && event.length === SIXTEENTHS) {
                 // chords are held until the next bar replaces them
                 heldChord.push(note(event.midi))
                 instrument.triggerAttack(note(event.midi), at, event.velocity)
@@ -199,6 +202,17 @@ const releaseChord = time => {
     heldChord = []
 }
 
+// a change of heart changes the instruments. done at the top of a bar
+// once the old chord has been let go of
+const dress = emotion => {
+    if (emotion === dressed || !TIMBRES[emotion]) {
+        return
+    }
+    dressed = emotion
+    instruments.pad.set(TIMBRES[emotion].pad)
+    instruments.arp.set(TIMBRES[emotion].arp)
+}
+
 // the mix follows the mood too
 const colour = (current, seconds = 1) => {
     const { valence, severity } = current
@@ -232,7 +246,7 @@ const onBeat = time => {
         const fresh = compose()
         // a real change of scene starts a new bar there and then.
         // anything less keeps the groove and just swaps the tune
-        if (!composed || fresh.feel !== composed.feel || fresh.mode !== composed.mode || mood.doom || mood.pivot) {
+        if (!composed || fresh.feel !== composed.feel || fresh.mode !== composed.mode || fresh.key !== composed.key || mood.doom || mood.pivot) {
             if (beat > 0) {
                 beat = 0
                 bar++
@@ -247,9 +261,10 @@ const onBeat = time => {
     if (beat === 0) {
         composed = compose()
         releaseChord(time)
+        dress(composed.emotion)
         transport.bpm.setValueAtTime(composed.bpm, time)
         colour(mood)
-        const info = { bar, bpm: composed.bpm, mode: composed.mode.name, feel: composed.feel }
+        const info = { bar, bpm: composed.bpm, mode: composed.mode.name, key: keyName(mood), feel: composed.feel, emotion: composed.emotion }
         Tone.getDraw().schedule(() => listeners.onBar && listeners.onBar(info), time)
     }
 
@@ -378,7 +393,7 @@ export const toll = () => {
 
 const silence = () => {
     heldChord = []
-    ;['pad', 'you', 'them', 'bell'].forEach(name => instruments[name].releaseAll())
+    ;['pad', 'arp', 'you', 'them', 'bell'].forEach(name => instruments[name].releaseAll())
     instruments.bass.triggerRelease()
 }
 
@@ -423,6 +438,7 @@ export const playEnding = overall => new Promise(resolve => {
     const ending = composeEnding(overall)
     const sixteenth = 60 / ending.bpm / 4
     const isBad = overall.balance < -0.2
+    dress(isBad ? 'doom' : overall.balance < 0.2 ? 'uncertain' : 'happy')
     const start = Tone.now() + 0.1
     colour({ valence: Math.max(-1, Math.min(1, overall.balance * 1.6)), severity: isBad ? 0.8 : 0, doom: isBad }, 0.2)
     ending.events.forEach(event => play(event, start + event.at * sixteenth, sixteenth, false))
