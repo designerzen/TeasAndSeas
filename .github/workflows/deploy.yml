@@ -24,7 +24,11 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      # kokoro-js pulls in onnxruntime-node, whose install tries to download
+      # CUDA binaries. the voices run in the browser so they are not needed
       - run: npm ci
+        env:
+          ONNXRUNTIME_NODE_INSTALL_CUDA: skip
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
